@@ -1,0 +1,36 @@
+# Node.js 패키지 및 로그 (ESLint 등 사용 시)
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+package-lock.json
+yarn.lock
+
+# OS 생성 파일
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 에디터 및 IDE 설정 파일
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# 환경 변수 (혹시 모를 외부 API 키나 보안 데이터 보관용)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 기타 임시 파일 및 로그
+logs
+*.log
+temp/
