@@ -1,0 +1,26 @@
+{
+    "name": "futuresoft_metaverse",
+    "version": "1.0.0",
+    "description": "충북청년미래센터의 청년 참여 및 정보 제공 극대화를 위한 ZEP 기반 2D 메타버스 구축 프로젝트입니다. 고립·은둔 청년 및 가족돌봄 청년이 대면 접촉 없이도 센터 지원 사업 정보를 쉽게 얻을 수 있도록, 익명성과 게임성을 결합한 '여고추리반' 스타일의 추리·탐색형 공간으로 기획되었습니다.",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint scripts/**/*.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sswck/Futuresoft_Metaverse.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "bugs": {
+        "url": "https://github.com/sswck/Futuresoft_Metaverse/issues"
+    },
+    "homepage": "https://github.com/sswck/Futuresoft_Metaverse#readme",
+    "devDependencies": {
+        "eslint": "^10.12.0",
+        "globals": "^17.13.0"
+    }
+}
