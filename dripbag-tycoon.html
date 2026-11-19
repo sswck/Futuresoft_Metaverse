@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>미래 제작소 · 드립백 선물세트 만들기</title>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Jua&family=Press+Start+2P&display=swap");
@@ -16,8 +16,6 @@
       --mint: #79d8b0;
       --mint-dark: #2f7d5b;
       --gold: #ffcf56;
-      --blue: #83c9f4;
-      --brown: #7c563c;
       --danger: #e46c5c;
     }
 
@@ -30,8 +28,10 @@
       margin: 0;
       padding: 0;
       width: 100%;
-      height: 100%;
+      height: 100vh;
+      height: 100dvh;
       overflow: hidden;
+      overscroll-behavior: none;
       background: var(--paper);
       color: var(--ink);
       font-family: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
@@ -44,8 +44,8 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 10px;
-      gap: 8px;
+      padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+      gap: 6px;
       background-image: radial-gradient(#d8c7aa 1px, transparent 1px);
       background-size: 16px 16px;
     }
@@ -55,93 +55,86 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      padding: 8px 12px;
+      gap: 8px;
+      padding: 7px 10px;
       background: var(--cream);
       border: 3px solid var(--ink);
       border-radius: 10px;
-      box-shadow: 0 4px 0 #cbbba0;
+      box-shadow: 0 3px 0 #cbbba0;
       flex-shrink: 0;
     }
 
     .hud-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
+      min-width: 0;
     }
 
-    .brand {
-      font-size: clamp(16px, 2.2vw, 22px);
-      white-space: nowrap;
-    }
+    .brand { font-size: clamp(14px, 2.2vw, 21px); white-space: nowrap; }
     .brand span { color: #e6764c; }
 
     .pill {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
+      gap: 4px;
+      padding: 3px 8px;
       background: var(--panel);
       border: 2px solid var(--ink);
-      border-radius: 8px;
-      font-size: clamp(12px, 1.4vw, 14px);
+      border-radius: 7px;
+      font-size: clamp(11px, 1.4vw, 14px);
       white-space: nowrap;
     }
-    .pill em {
-      font-style: normal;
-      color: #d9643a;
-    }
+    .pill em { font-style: normal; color: #d9643a; }
 
-    .hud-right {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
+    .hud-right { display: flex; gap: 5px; flex-shrink: 0; }
 
     .btn-top {
       border: 2.5px solid var(--ink);
       border-radius: 8px;
       background: var(--panel);
       color: var(--ink);
-      padding: 5px 11px;
+      padding: 5px 10px;
+      min-height: 34px;
       font-family: inherit;
-      font-size: 14px;
+      font-size: clamp(12px, 1.5vw, 14px);
       cursor: pointer;
       box-shadow: 0 3px 0 var(--ink);
       transition: transform 0.08s, box-shadow 0.08s, background 0.12s;
+      white-space: nowrap;
     }
     .btn-top:hover { background: #ffe8d6; }
     .btn-top:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
     .btn-top.close { background: #f5d8d0; }
     .btn-top.close:hover { background: #ffbfb0; }
 
-    /* 상단 공방 일러스트 배너 */
+    /* 상단 공방 컨베이어 배너 */
     .workshop-banner {
       position: relative;
-      height: 112px;
+      height: clamp(72px, 13vh, 106px);
       flex-shrink: 0;
-      border: 3.5px solid var(--ink);
-      border-radius: 12px;
+      border: 3px solid var(--ink);
+      border-radius: 11px;
       overflow: hidden;
       background: linear-gradient(#9fd7ec 0 14%, #f6e7c5 14% 72%, #a57a52 72% 76%, #cfa06e 76% 100%);
-      box-shadow: 0 4px 0 #cbbba0;
+      box-shadow: 0 3px 0 #cbbba0;
     }
 
     .conveyor-track {
       position: absolute;
-      left: 6%;
-      right: 6%;
-      bottom: 10px;
-      height: 14px;
-      border: 3px solid var(--ink);
-      border-radius: 8px;
+      left: 5%;
+      right: 5%;
+      bottom: 8px;
+      height: 12px;
+      border: 2.5px solid var(--ink);
+      border-radius: 7px;
       background: repeating-linear-gradient(90deg, #3c5163 0 14px, #8da8b8 14px 20px);
     }
 
     .station-icons {
       position: absolute;
-      inset: 0 6% 24px 6%;
+      inset: 0 5% 20px 5%;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       align-items: end;
@@ -153,53 +146,38 @@
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      opacity: 0.55;
+      opacity: 0.52;
       transform: scale(0.92);
       transition: all 0.25s ease;
     }
-    .machine-node.active {
-      opacity: 1;
-      transform: scale(1.06) translateY(-3px);
-    }
-    .machine-node.done {
-      opacity: 0.9;
-    }
+    .machine-node.active { opacity: 1; transform: scale(1.06) translateY(-2px); }
+    .machine-node.done { opacity: 0.9; }
 
     .machine-badge {
-      font-size: 11px;
+      font-size: clamp(9px, 1.2vw, 11px);
       background: var(--cream);
       border: 2px solid var(--ink);
-      border-radius: 6px;
-      padding: 1px 7px;
+      border-radius: 5px;
+      padding: 1px 5px;
       white-space: nowrap;
     }
-    .machine-node.active .machine-badge {
-      background: var(--gold);
-    }
-    .machine-node.done .machine-badge {
-      background: #c8f2dc;
-    }
+    .machine-node.active .machine-badge { background: var(--gold); }
+    .machine-node.done .machine-badge { background: #c8f2dc; }
+    .machine-emoji { font-size: clamp(18px, 3vw, 26px); line-height: 1; }
 
-    .machine-emoji {
-      font-size: 28px;
-      line-height: 1.05;
-      filter: drop-shadow(0 3px 0 rgba(34, 51, 67, 0.25));
-    }
-
-    /* 이동하는 드립백 토큰 */
     .moving-pack {
       position: absolute;
-      bottom: 20px;
+      bottom: 16px;
       left: 15%;
       transform: translateX(-50%);
-      width: 34px;
-      height: 40px;
+      width: 30px;
+      height: 34px;
       background: #f8ebd0;
-      border: 3px solid var(--ink);
+      border: 2.5px solid var(--ink);
       border-radius: 6px;
       display: grid;
       place-items: center;
-      font-size: 16px;
+      font-size: 14px;
       box-shadow: 0 3px 0 rgba(34, 51, 67, 0.3);
       transition: left 0.4s cubic-bezier(0.2, 1.3, 0.4, 1);
       z-index: 3;
@@ -209,7 +187,7 @@
     .stepper {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
+      gap: 5px;
       flex-shrink: 0;
     }
 
@@ -217,37 +195,55 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 6px 8px;
-      border: 2.5px solid #7d8995;
+      gap: 5px;
+      padding: 5px 6px;
+      border: 2px solid #7d8995;
       border-radius: 8px;
       background: #eae2d3;
       color: #677482;
-      font-size: clamp(11px, 1.3vw, 14px);
+      font-size: clamp(10.5px, 1.3vw, 13.5px);
+      white-space: nowrap;
       transition: all 0.2s;
     }
     .step-chip .num {
-      width: 20px;
-      height: 20px;
+      width: 19px;
+      height: 19px;
       border-radius: 5px;
       border: 2px solid currentColor;
       display: grid;
       place-items: center;
-      font-size: 11px;
+      font-size: 10px;
       flex-shrink: 0;
     }
     .step-chip.active {
       border-color: var(--ink);
       background: #ffe094;
       color: var(--ink);
-      box-shadow: 0 3px 0 var(--ink);
-      transform: translateY(-1px);
+      box-shadow: 0 2px 0 var(--ink);
     }
-    .step-chip.done {
-      border-color: var(--mint-dark);
-      background: #c9f1dc;
-      color: #1f5c41;
+    .step-chip.done { border-color: var(--mint-dark); background: #c9f1dc; color: #1f5c41; }
+
+    /* 모바일 전용 주문 요약 바 (데스크톱 숨김) */
+    .mobile-orders {
+      display: none;
+      gap: 5px;
+      flex-shrink: 0;
     }
+    .m-order-pill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 4px 6px;
+      border: 2px solid #c5b496;
+      border-radius: 7px;
+      background: var(--panel);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .m-order-pill.current { border-color: var(--ink); background: #fff3cf; }
+    .m-order-pill.done { border-color: var(--mint-dark); background: #d7f5e5; color: #1f5c41; }
 
     /* 메인 작업대 레이아웃 */
     .workspace {
@@ -255,21 +251,20 @@
       min-height: 0;
       display: grid;
       grid-template-columns: 1.45fr 0.85fr;
-      gap: 10px;
+      gap: 8px;
       position: relative;
     }
 
     .panel {
       background: var(--cream);
-      border: 3.5px solid var(--ink);
+      border: 3px solid var(--ink);
       border-radius: 12px;
-      padding: 14px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 5px 0 #cbbba0;
+      gap: 8px;
+      box-shadow: 0 4px 0 #cbbba0;
       min-height: 0;
-      position: relative;
       overflow: hidden;
     }
 
@@ -277,29 +272,27 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
       border-bottom: 2px dashed #d3c2a6;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
+      flex-shrink: 0;
     }
-
-    .panel-head h2 {
-      margin: 0;
-      font-size: clamp(17px, 2vw, 21px);
-    }
+    .panel-head h2 { margin: 0; font-size: clamp(15px, 2vw, 20px); }
 
     .blend-tag {
-      padding: 3px 10px;
+      padding: 3px 9px;
       border-radius: 99px;
       border: 2px solid var(--ink);
-      font-size: 13px;
+      font-size: clamp(11px, 1.3vw, 13px);
       color: #fff;
       white-space: nowrap;
     }
 
     .stage-desc {
       margin: 0;
-      font-size: 14px;
+      font-size: clamp(12px, 1.4vw, 14px);
       color: #516374;
+      flex-shrink: 0;
     }
 
     .task-canvas {
@@ -308,34 +301,28 @@
       background: var(--panel);
       border: 3px solid var(--ink);
       border-radius: 10px;
-      padding: 14px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 14px;
+      gap: 12px;
       position: relative;
-      touch-action: none;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* 게이지 (1공정 분쇄 / 3공정 실링) */
-    .gauge-wrap {
-      width: min(440px, 95%);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    /* 게이지 (1공정 / 3공정) */
+    .gauge-wrap { width: min(440px, 96%); display: flex; flex-direction: column; gap: 6px; }
     .gauge-bar {
       position: relative;
-      height: 36px;
-      border: 3.5px solid var(--ink);
+      height: clamp(30px, 5vh, 38px);
+      border: 3px solid var(--ink);
       border-radius: 10px;
       background: repeating-linear-gradient(90deg, #efe4ce 0 14px, #f8f1df 14px 18px);
       overflow: hidden;
       box-shadow: inset 0 3px 0 rgba(34, 51, 67, 0.12);
     }
-
     .sweet-zone {
       position: absolute;
       top: 0;
@@ -350,10 +337,9 @@
       inset: 0;
       display: grid;
       place-items: center;
-      font: 9px "Press Start 2P", monospace;
+      font: 8px "Press Start 2P", monospace;
       color: #1c573c;
     }
-
     .needle {
       position: absolute;
       top: -2px;
@@ -365,414 +351,329 @@
       border: 2.5px solid var(--ink);
       border-radius: 4px;
       z-index: 3;
-      box-shadow: 0 0 8px rgba(239, 111, 72, 0.6);
     }
+    .gauge-hints { display: flex; justify-content: space-between; font-size: clamp(11px, 1.3vw, 12.5px); color: #667584; }
 
-    .gauge-hints {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #667584;
-    }
-
-    /* 2공정: 11g 계량 저울 */
-    .scale-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-    }
-
+    /* 2공정 11g 저울 */
+    .scale-box { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
     .scale-display {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      padding: 10px 22px;
+      padding: 8px 20px;
       background: #253646;
       color: #7df2b8;
-      border: 4px solid var(--ink);
+      border: 3.5px solid var(--ink);
       border-radius: 10px;
       font-family: "Press Start 2P", monospace;
-      font-size: 24px;
-      box-shadow: inset 0 -4px 0 #182532;
-      min-width: 180px;
+      font-size: clamp(18px, 4vw, 24px);
+      min-width: 140px;
+      text-align: center;
     }
-    .scale-display.exact {
-      color: #ffdf6b;
-      box-shadow: 0 0 0 4px rgba(121, 216, 176, 0.55);
-    }
-
+    .scale-display.exact { color: #ffdf6b; box-shadow: 0 0 0 4px rgba(121, 216, 176, 0.55); }
     .gram-controls {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      width: min(360px, 100%);
     }
 
-    /* 4공정: 외피 라벨 드래그 & 드롭 */
+    /* 4공정 외피 라벨 드래그/탭 */
     .label-stage {
       width: 100%;
-      height: 100%;
       display: flex;
       align-items: center;
-      justify-content: space-around;
-      gap: 14px;
+      justify-content: space-evenly;
+      gap: 12px;
       flex-wrap: wrap;
     }
-
     .pouch-target {
-      width: 148px;
-      height: 166px;
-      border: 4px solid var(--ink);
+      width: clamp(116px, 28vw, 148px);
+      height: clamp(120px, 26vh, 160px);
+      border: 3.5px solid var(--ink);
       border-radius: 12px;
       background: linear-gradient(180deg, #f7ecd4 0 22%, #efe0be 22% 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       position: relative;
-      box-shadow: 0 6px 0 rgba(34, 51, 67, 0.22);
+      box-shadow: 0 5px 0 rgba(34, 51, 67, 0.22);
       transition: transform 0.15s, background 0.15s, border-color 0.15s;
     }
     .pouch-target::before {
       content: "";
       position: absolute;
-      top: 14px;
-      left: 10px;
-      right: 10px;
-      height: 4px;
-      border-bottom: 3px dashed #b9a482;
+      top: 12px;
+      left: 8px;
+      right: 8px;
+      border-bottom: 2.5px dashed #b9a482;
     }
     .pouch-target.drag-over {
-      transform: scale(1.06);
+      transform: scale(1.05);
       background: #e1faec;
       border-color: var(--mint-dark);
       box-shadow: 0 0 0 5px rgba(121, 216, 176, 0.5);
     }
     .pouch-slot {
-      width: 108px;
-      height: 54px;
-      border: 3px dashed #9d8c72;
+      width: 86%;
+      padding: 6px 4px;
+      border: 2.5px dashed #9d8c72;
       border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-size: 12px;
+      font-size: clamp(10.5px, 1.3vw, 12px);
       color: #7c6f5c;
-      background: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.65);
       text-align: center;
-      padding: 4px;
     }
-
     .label-rack {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      width: min(240px, 100%);
     }
-
     .drag-label {
-      padding: 10px 16px;
+      padding: 9px 14px;
+      min-height: 44px;
       border: 3px solid var(--ink);
       border-radius: 10px;
       color: #fff;
-      font-size: 15px;
+      font-size: clamp(13px, 1.5vw, 15px);
       cursor: grab;
       box-shadow: 0 4px 0 var(--ink);
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      gap: 6px;
       touch-action: none;
-      transition: transform 0.1s;
     }
-    .drag-label:hover { transform: translateY(-2px); }
     .drag-label:active { cursor: grabbing; }
 
-    /* 5공정: 완성 드립백 -> 선물박스 드래그 */
+    /* 5공정 선물박스 드래그/탭 */
     .box-stage {
       width: 100%;
-      height: 100%;
       display: flex;
       align-items: center;
-      justify-content: space-around;
-      gap: 16px;
+      justify-content: space-evenly;
+      gap: 12px;
       flex-wrap: wrap;
     }
-
     .finished-bag {
-      width: 120px;
-      height: 144px;
-      border: 4px solid var(--ink);
+      width: clamp(104px, 24vw, 124px);
+      height: clamp(114px, 24vh, 142px);
+      border: 3.5px solid var(--ink);
       border-radius: 12px;
       background: #fff7e2;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
       cursor: grab;
-      box-shadow: 0 6px 0 var(--ink);
+      box-shadow: 0 5px 0 var(--ink);
       touch-action: none;
       animation: bob 1.5s ease-in-out infinite;
     }
-    .finished-bag:hover { transform: scale(1.04); }
-
-    .bag-sticker {
-      padding: 3px 10px;
-      border-radius: 6px;
-      border: 2px solid var(--ink);
-      color: #fff;
-      font-size: 12px;
-    }
-
+    .bag-sticker { padding: 2px 8px; border-radius: 6px; border: 2px solid var(--ink); color: #fff; font-size: 11px; }
     .gift-box-drop {
-      width: 210px;
-      height: 150px;
-      border: 4px solid var(--ink);
+      width: min(220px, 90%);
+      height: clamp(118px, 24vh, 148px);
+      border: 3.5px solid var(--ink);
       border-radius: 12px;
       background: #e6c79c;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 10px;
-      box-shadow: 0 6px 0 rgba(34, 51, 67, 0.25);
+      padding: 8px;
+      box-shadow: 0 5px 0 rgba(34, 51, 67, 0.25);
       transition: transform 0.15s, background 0.15s, border-color 0.15s;
     }
     .gift-box-drop.drag-over {
-      transform: scale(1.05);
+      transform: scale(1.04);
       background: #dcf8e8;
       border-color: var(--mint-dark);
       box-shadow: 0 0 0 5px rgba(121, 216, 176, 0.5);
     }
-
     .box-slots {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 6px;
       width: 100%;
       flex: 1;
-      margin-top: 6px;
+      margin-top: 5px;
     }
-
     .box-slot {
-      border: 2.5px dashed #8c6a43;
-      border-radius: 8px;
+      border: 2px dashed #8c6a43;
+      border-radius: 7px;
       background: rgba(255, 248, 234, 0.55);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 10.5px;
       color: #7c6449;
     }
-    .box-slot.filled {
-      border-style: solid;
-      border-color: var(--ink);
-      background: #fff8e6;
-      color: var(--ink);
-      animation: popIn 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
-    }
+    .box-slot.filled { border-style: solid; border-color: var(--ink); background: #fff8e6; color: var(--ink); animation: popIn 0.3s ease; }
 
     /* 공통 버튼 */
     .action-btn {
       border: 3px solid var(--ink);
       border-radius: 10px;
-      padding: 10px 22px;
+      padding: 10px 20px;
+      min-height: 46px;
       font-family: inherit;
-      font-size: 17px;
+      font-size: clamp(15px, 2vw, 17px);
       cursor: pointer;
       background: var(--orange);
       color: var(--ink);
       box-shadow: 0 4px 0 var(--ink);
-      transition: transform 0.08s, box-shadow 0.08s, background 0.12s;
+      transition: transform 0.08s, box-shadow 0.08s;
+      max-width: 100%;
     }
-    .action-btn:hover { filter: brightness(1.04); }
     .action-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
     .action-btn.mint { background: var(--mint); }
-    .action-btn.sub { background: #efe5cf; font-size: 15px; padding: 8px 14px; }
+    .action-btn.sub { background: #efe5cf; font-size: clamp(13px, 1.6vw, 15px); padding: 8px 8px; min-height: 42px; }
 
-    /* 우측 주문서 & 세트 진행 패널 */
-    .order-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    /* 우측 주문서 패널 */
+    .order-list { display: flex; flex-direction: column; gap: 7px; }
     .order-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 9px 11px;
+      padding: 8px 10px;
       border: 2.5px solid #c5b496;
-      border-radius: 10px;
+      border-radius: 9px;
       background: var(--panel);
-      font-size: 14px;
+      font-size: 13.5px;
     }
-    .order-item.current {
-      border-color: var(--ink);
-      background: #fff3cf;
-      box-shadow: 0 3px 0 rgba(34, 51, 67, 0.2);
-    }
-    .order-item.done {
-      border-color: var(--mint-dark);
-      background: #d7f5e5;
-    }
-
-    .order-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      border: 2px solid var(--ink);
-      flex-shrink: 0;
-    }
+    .order-item.current { border-color: var(--ink); background: #fff3cf; }
+    .order-item.done { border-color: var(--mint-dark); background: #d7f5e5; }
+    .order-left { display: flex; align-items: center; gap: 7px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--ink); flex-shrink: 0; }
 
     .quality-card {
       margin-top: auto;
-      padding: 10px 12px;
-      border: 2.5px dashed #b9a482;
-      border-radius: 10px;
+      padding: 9px 11px;
+      border: 2px dashed #b9a482;
+      border-radius: 9px;
       background: var(--panel);
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-size: 13px;
+      gap: 5px;
+      font-size: 12.5px;
     }
-
-    .q-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .q-row { display: flex; justify-content: space-between; align-items: center; }
 
     .feedback-box {
-      padding: 8px 10px;
+      padding: 7px 10px;
       border-radius: 8px;
       border: 2px solid var(--ink);
       background: #edf6ef;
-      font-size: 13px;
+      font-size: clamp(11.5px, 1.3vw, 13px);
       color: #295742;
-      min-height: 38px;
+      min-height: 34px;
       display: flex;
       align-items: center;
     }
-    .feedback-box.warn {
-      background: #ffe6df;
-      color: #a63a2c;
-    }
+    .feedback-box.warn { background: #ffe6df; color: #a63a2c; }
 
-    /* 드래그 고스트 */
+    /* 모바일 하단 피드백 바 (데스크톱 숨김) */
+    .mobile-feedback { display: none; flex-shrink: 0; }
+
     .drag-ghost {
       position: fixed;
       z-index: 500;
       pointer-events: none;
-      transform: translate(-50%, -50%) scale(1.08);
+      transform: translate(-50%, -50%) scale(1.06);
       box-shadow: 0 12px 22px rgba(34, 51, 67, 0.34);
     }
 
-    /* 클리어 모달 */
+    /* 완료 모달 */
     .modal-backdrop {
       position: fixed;
       inset: 0;
       z-index: 600;
       display: none;
       place-items: center;
-      padding: 16px;
+      padding: 14px;
       background: rgba(20, 34, 48, 0.64);
       backdrop-filter: blur(2px);
     }
     .modal-backdrop.open { display: grid; }
-
     .modal-card {
-      width: min(440px, 92%);
-      padding: 24px 22px 20px;
+      width: min(420px, 94%);
+      padding: 20px 18px 18px;
       background: var(--cream);
-      border: 5px solid var(--ink);
+      border: 4px solid var(--ink);
       border-radius: 16px;
       text-align: center;
-      box-shadow: 0 10px 0 rgba(20, 34, 48, 0.45);
+      box-shadow: 0 8px 0 rgba(20, 34, 48, 0.45);
       background-image: radial-gradient(#dfd0b6 1px, transparent 1px);
       background-size: 14px 14px;
       animation: popIn 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
     }
-    .modal-art { font-size: 54px; line-height: 1.1; margin-bottom: 6px; }
-    .modal-card h2 { margin: 4px 0 8px; font-size: 28px; text-shadow: 2px 2px #c8ebd7; }
-    .modal-card p { margin: 0 0 14px; color: #4b5d6d; line-height: 1.55; font-size: 15px; }
-    .result-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-    .result-box {
-      padding: 8px;
-      border: 2.5px solid var(--ink);
-      border-radius: 10px;
-      background: var(--panel);
-      font-size: 13px;
-    }
-    .result-box strong {
-      display: block;
-      font-size: 20px;
-      color: #d9643a;
-      margin-top: 2px;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
+    .modal-art { font-size: clamp(40px, 8vw, 52px); line-height: 1.1; margin-bottom: 6px; }
+    .modal-card h2 { margin: 4px 0 8px; font-size: clamp(21px, 4.5vw, 27px); text-shadow: 2px 2px #c8ebd7; }
+    .modal-card p { margin: 0 0 12px; color: #4b5d6d; line-height: 1.5; font-size: clamp(13px, 2.5vw, 15px); }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .result-box { padding: 8px; border: 2.5px solid var(--ink); border-radius: 10px; background: var(--panel); font-size: 12px; }
+    .result-box strong { display: block; font-size: clamp(16px, 3.5vw, 20px); color: #d9643a; margin-top: 2px; }
+    .modal-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 
     .standalone-toast {
       position: fixed;
       left: 50%;
-      bottom: 16px;
+      bottom: 14px;
       transform: translateX(-50%) translateY(20px);
       z-index: 700;
       background: #223343;
       color: #fff8ea;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: 99px;
-      font-size: 13px;
+      font-size: 12px;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s, transform 0.2s;
     }
     .standalone-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    @keyframes bob {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-    @keyframes popIn {
-      0% { transform: scale(0.75); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    @media (max-width: 760px) {
-      .workshop-banner { height: 84px; }
-      .machine-emoji { font-size: 22px; }
+    /* ===== 반응형 1: 모바일 & 좁은 화면 (<= 720px) ===== */
+    @media (max-width: 720px) {
+      .hud { padding: 5px 8px; }
+      .pill.hide-sm { display: none; }
+      .workshop-banner { height: 68px; }
+      .machine-badge { display: none; }
+      .step-chip span:last-child { display: none; }
+      .mobile-orders { display: flex; }
+      .mobile-feedback { display: flex; }
       .workspace { grid-template-columns: 1fr; }
       .panel.side { display: none; }
-      .step-chip span:last-child { display: none; }
+      .panel { padding: 9px; gap: 6px; }
+      .task-canvas { padding: 10px; gap: 10px; }
+      .box-arrow { display: none; }
+      .action-btn:not(.sub) { width: min(300px, 100%); }
     }
+
+    /* ===== 반응형 2: 낮은 가로 화면 (height <= 500px) ===== */
+    @media (max-height: 500px) {
+      .app { padding: 4px; gap: 4px; }
+      .workshop-banner { display: none; }
+      .hud { padding: 4px 8px; }
+      .panel { padding: 8px; gap: 5px; }
+      .task-canvas { padding: 8px; gap: 8px; }
+      .stage-desc { font-size: 11.5px; }
+    }
+
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes popIn { 0% { transform: scale(0.75); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="hud">
       <div class="hud-left">
-        <div class="brand">☕ 미래 제작소 <span>· 드립백 공방</span></div>
-        <div class="pill">📦 세트 진행 <em id="bagCount">0 / 3봉</em></div>
-        <div class="pill">⭐ 평균 품질 <em id="avgQuality">—</em></div>
-        <div class="pill">💰 예상 수익 <em id="cashText">0원</em></div>
+        <div class="brand">☕ 미래 제작소 <span>· 드립백</span></div>
+        <div class="pill">📦 <em id="bagCount">0 / 3봉</em></div>
+        <div class="pill hide-sm">⭐ <em id="avgQuality">—</em></div>
+        <div class="pill">💰 <em id="cashText">0원</em></div>
       </div>
       <div class="hud-right">
         <button type="button" class="btn-top" id="btnReset">↻ 다시</button>
@@ -780,53 +681,51 @@
       </div>
     </header>
 
-    <!-- 상단 공방 컨베이어 시각화 -->
     <section class="workshop-banner" aria-hidden="true">
       <div class="station-icons" id="machineNodes">
-        <div class="machine-node"><span class="machine-emoji">⚙️</span><span class="machine-badge">1. 분쇄기</span></div>
-        <div class="machine-node"><span class="machine-emoji">⚖️</span><span class="machine-badge">2. 11g 저울</span></div>
-        <div class="machine-node"><span class="machine-emoji">🔥</span><span class="machine-badge">3. 실링기</span></div>
-        <div class="machine-node"><span class="machine-emoji">🏷️</span><span class="machine-badge">4. 라벨링</span></div>
-        <div class="machine-node"><span class="machine-emoji">📦</span><span class="machine-badge">5. 선물포장</span></div>
+        <div class="machine-node"><span class="machine-emoji">⚙️</span><span class="machine-badge">1. 분쇄</span></div>
+        <div class="machine-node"><span class="machine-emoji">⚖️</span><span class="machine-badge">2. 11g</span></div>
+        <div class="machine-node"><span class="machine-emoji">🔥</span><span class="machine-badge">3. 실링</span></div>
+        <div class="machine-node"><span class="machine-emoji">🏷️</span><span class="machine-badge">4. 라벨</span></div>
+        <div class="machine-node"><span class="machine-emoji">📦</span><span class="machine-badge">5. 포장</span></div>
       </div>
       <div class="moving-pack" id="movingPack">☕</div>
       <div class="conveyor-track"></div>
     </section>
 
-    <!-- 5단계 스텝 표시 -->
     <nav class="stepper" id="stepper"></nav>
 
-    <!-- 메인 작업대 + 주문서 -->
+    <!-- 모바일 전용 주문 상태 바 -->
+    <div class="mobile-orders" id="mobileOrders"></div>
+
     <main class="workspace">
       <section class="panel">
         <div class="panel-head">
           <h2 id="stageTitle">1. 원두 분쇄</h2>
-          <span class="blend-tag" id="blendTag">고소한 블렌드 (NUTTY)</span>
+          <span class="blend-tag" id="blendTag">고소한 블렌드</span>
         </div>
-        <p class="stage-desc" id="stageDesc">바늘이 초록 PERFECT 구간에 왔을 때 정지 버튼을 누르세요.</p>
+        <p class="stage-desc" id="stageDesc">바늘이 초록 PERFECT 구간에 왔을 때 멈춰 주세요.</p>
         <div class="task-canvas" id="taskCanvas"></div>
       </section>
 
       <aside class="panel side">
-        <div class="panel-head">
-          <h2>🧾 오늘의 선물세트 주문</h2>
-        </div>
+        <div class="panel-head"><h2>🧾 선물세트 주문서</h2></div>
         <div class="order-list" id="orderList"></div>
-
-        <div class="feedback-box" id="feedbackBox">
-          정성을 담아 센터 드립백 3봉 선물세트를 완성해 보세요!
-        </div>
-
+        <div class="feedback-box" id="feedbackBox">정성을 담아 드립백 3봉 선물세트를 완성해 보세요!</div>
         <div class="quality-card">
           <div class="q-row"><span>현재 봉지 품질</span><strong id="curBagQuality">작업 중</strong></div>
-          <div class="q-row"><span>선물세트 목표</span><strong>3종 블렌드 각 1봉</strong></div>
-          <div class="q-row"><span>조작 안내</span><span>클릭 · 드래그&amp;드롭</span></div>
+          <div class="q-row"><span>목표 세트</span><strong>3종 블렌드 각 1봉</strong></div>
+          <div class="q-row"><span>조작</span><span>클릭 · 드래그 · 터치</span></div>
         </div>
       </aside>
     </main>
+
+    <!-- 모바일 전용 피드백 바 -->
+    <div class="feedback-box mobile-feedback" id="mobileFeedback">
+      정성을 담아 드립백 3봉 선물세트를 완성해 보세요!
+    </div>
   </div>
 
-  <!-- 완료 모달 -->
   <div class="modal-backdrop" id="clearModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-card">
       <div class="modal-art">🎁☕✨</div>
@@ -851,23 +750,24 @@
   <script>
     (() => {
       const STAGES = [
-        { name: "원두 분쇄",   desc: "분쇄 바늘이 초록색 PERFECT 구간에 왔을 때 멈춰 주세요." },
-        { name: "11g 소분",    desc: "버튼으로 원두 무게를 정확히 11g에 맞춘 뒤 확정해 주세요." },
-        { name: "내피 밀봉",   desc: "열 실링 바늘을 초록색 구간에 맞춰 꼼꼼히 밀봉해 주세요." },
-        { name: "외피 라벨링", desc: "현재 주문에 맞는 블렌드 라벨을 드립백 위로 드래그(또는 탭)해 붙여주세요." },
-        { name: "선물박스 담기", desc: "완성된 드립백을 선물 상자로 드래그(또는 탭)해 차곡차곡 담아주세요." }
+        { name: "원두 분쇄",   desc: "분쇄 바늘이 초록 PERFECT 구간에 왔을 때 멈춰 주세요." },
+        { name: "11g 소분",    desc: "버튼으로 무게를 정확히 11g에 맞춘 뒤 확정해 주세요." },
+        { name: "내피 밀봉",   desc: "열 실링 바늘을 초록 구간에 맞춰 꼼꼼히 밀봉해 주세요." },
+        { name: "외피 라벨링", desc: "주문에 맞는 블렌드 라벨을 파우치 위로 드래그(또는 탭)해 주세요." },
+        { name: "선물박스",    desc: "완성된 드립백을 선물 상자로 드래그(또는 탭)해 담아주세요." }
       ];
 
       const BLENDS = [
-        { key: "NUTTY",  name: "고소한 블렌드", color: "#c27d48", emoji: "🌰" },
-        { key: "BRIGHT", name: "산뜻한 블렌드", color: "#4e9c74", emoji: "🍋" },
-        { key: "BOLD",   name: "깊은 블렌드",   color: "#6b5785", emoji: "🍫" }
+        { key: "NUTTY",  name: "고소한 블렌드", short: "고소", color: "#c27d48", emoji: "🌰" },
+        { key: "BRIGHT", name: "산뜻한 블렌드", short: "산뜻", color: "#4e9c74", emoji: "🍋" },
+        { key: "BOLD",   name: "깊은 블렌드",   short: "깊은", color: "#6b5785", emoji: "🍫" }
       ];
 
       const bagCountEl = document.getElementById("bagCount");
       const avgQualityEl = document.getElementById("avgQuality");
       const cashTextEl = document.getElementById("cashText");
       const stepperEl = document.getElementById("stepper");
+      const mobileOrdersEl = document.getElementById("mobileOrders");
       const machineNodes = [...document.querySelectorAll(".machine-node")];
       const movingPackEl = document.getElementById("movingPack");
       const stageTitleEl = document.getElementById("stageTitle");
@@ -876,25 +776,26 @@
       const taskCanvas = document.getElementById("taskCanvas");
       const orderListEl = document.getElementById("orderList");
       const feedbackBox = document.getElementById("feedbackBox");
+      const mobileFeedback = document.getElementById("mobileFeedback");
       const curBagQualityEl = document.getElementById("curBagQuality");
       const clearModal = document.getElementById("clearModal");
       const finalQualityEl = document.getElementById("finalQuality");
       const finalCashEl = document.getElementById("finalCash");
       const standaloneToast = document.getElementById("standaloneToast");
 
-      let bagIdx = 0; // 0, 1, 2
-      let stage = 0;  // 0..4
+      let bagIdx = 0;
+      let stage = 0;
       let grams = 8;
       let curParts = [];
-      let completedBags = []; // { blend, quality, payout }
+      let completedBags = [];
       let totalCash = 0;
       let rafId = null;
       let gaugeStart = 0;
       let needlePos = 0;
       let clearSent = false;
       let toastTimer = null;
+      let cleanupFns = [];
 
-      // ZEP 부모(main.js) 통신 + 일반 브라우저 테스트 안전 처리
       function sendToZep(payload) {
         const isEmbedded = window.parent && window.parent !== window;
         try {
@@ -902,7 +803,6 @@
             window.parent.postMessage(payload, "*");
           } else {
             window.postMessage(payload, "*");
-            console.info("[ZEP Widget 테스트 전송]", payload);
             standaloneToast.textContent = `브라우저 테스트: ${JSON.stringify(payload)} 전송됨`;
             standaloneToast.classList.add("show");
             clearTimeout(toastTimer);
@@ -916,12 +816,12 @@
       function setFeedback(text, isWarn = false) {
         feedbackBox.textContent = text;
         feedbackBox.className = "feedback-box" + (isWarn ? " warn" : "");
+        mobileFeedback.textContent = text;
+        mobileFeedback.className = "feedback-box mobile-feedback" + (isWarn ? " warn" : "");
       }
 
       function gradeLabel(q) {
-        if (q >= 90) return "특급";
-        if (q >= 75) return "양호";
-        return "보통";
+        return q >= 90 ? "특급" : q >= 75 ? "양호" : "보통";
       }
 
       function stopRaf() {
@@ -931,8 +831,13 @@
         }
       }
 
+      function runCleanups() {
+        cleanupFns.forEach(fn => fn());
+        cleanupFns = [];
+      }
+
       function currentAvgOfParts() {
-        if (curParts.length === 0) return null;
+        if (!curParts.length) return null;
         return Math.round(curParts.reduce((a, b) => a + b, 0) / curParts.length);
       }
 
@@ -941,9 +846,7 @@
         cashTextEl.textContent = `${totalCash.toLocaleString("ko-KR")}원`;
 
         if (completedBags.length > 0) {
-          const avgAll = Math.round(
-            completedBags.reduce((s, b) => s + b.quality, 0) / completedBags.length
-          );
+          const avgAll = Math.round(completedBags.reduce((s, b) => s + b.quality, 0) / completedBags.length);
           avgQualityEl.textContent = `${avgAll}% (${gradeLabel(avgAll)})`;
         } else {
           avgQualityEl.textContent = "—";
@@ -952,15 +855,10 @@
         const curQ = currentAvgOfParts();
         curBagQualityEl.textContent = curQ !== null ? `${curQ}% (${gradeLabel(curQ)})` : "작업 중";
 
-        // 주문 목록
         orderListEl.innerHTML = BLENDS.map((b, idx) => {
           const doneObj = completedBags[idx];
           const cls = doneObj ? "done" : idx === bagIdx ? "current" : "";
-          const status = doneObj
-            ? `✓ ${doneObj.quality}%`
-            : idx === bagIdx
-              ? "작업 중"
-              : "대기";
+          const status = doneObj ? `✓ ${doneObj.quality}%` : idx === bagIdx ? "작업 중" : "대기";
           return `
             <div class="order-item ${cls}">
               <div class="order-left">
@@ -972,7 +870,13 @@
           `;
         }).join("");
 
-        // 스텝바 & 상단 공방 기계
+        mobileOrdersEl.innerHTML = BLENDS.map((b, idx) => {
+          const doneObj = completedBags[idx];
+          const cls = doneObj ? "done" : idx === bagIdx ? "current" : "";
+          const mark = doneObj ? "✓" : idx === bagIdx ? "●" : "";
+          return `<div class="m-order-pill ${cls}">${b.emoji} ${b.short} ${mark}</div>`;
+        }).join("");
+
         stepperEl.innerHTML = STAGES.map((s, i) => `
           <div class="step-chip ${i === stage ? "active" : i < stage ? "done" : ""}">
             <span class="num">${i < stage ? "✓" : i + 1}</span>
@@ -985,26 +889,24 @@
           node.classList.toggle("done", i < stage);
         });
 
-        const positions = [15, 32.5, 50, 67.5, 85];
+        const positions = [14, 32, 50, 68, 86];
         movingPackEl.style.left = `${positions[stage]}%`;
         const curBlend = BLENDS[Math.min(bagIdx, BLENDS.length - 1)];
         movingPackEl.textContent = stage >= 3 ? curBlend.emoji : "☕";
       }
 
-      // 60fps 왕복 바늘 애니메이션
       function startGaugeLoop(speedMs, needleEl) {
         stopRaf();
         gaugeStart = performance.now();
         function frame(now) {
           const phase = ((now - gaugeStart) % speedMs) / speedMs;
-          needlePos = phase < 0.5 ? phase * 200 : (1 - phase) * 200; // 0..100
+          needlePos = phase < 0.5 ? phase * 200 : (1 - phase) * 200;
           if (needleEl) needleEl.style.left = `${needlePos}%`;
           rafId = requestAnimationFrame(frame);
         }
         rafId = requestAnimationFrame(frame);
       }
 
-      // 드래그 + 탭 공용 헬퍼
       function bindDragOrTap(sourceEl, targetEl, onSuccess, onMiss) {
         let dragging = null;
 
@@ -1032,19 +934,18 @@
         const onMove = e => {
           if (!dragging || e.pointerId !== dragging.pointerId) return;
           e.preventDefault();
-          const dx = e.clientX - dragging.startX;
-          const dy = e.clientY - dragging.startY;
-          if (Math.hypot(dx, dy) > 8) dragging.moved = true;
-
+          if (Math.hypot(e.clientX - dragging.startX, e.clientY - dragging.startY) > 8) {
+            dragging.moved = true;
+          }
           dragging.ghost.style.left = `${e.clientX}px`;
           dragging.ghost.style.top = `${e.clientY}px`;
 
           const tr = targetEl.getBoundingClientRect();
           const hit =
-            e.clientX >= tr.left - 14 &&
-            e.clientX <= tr.right + 14 &&
-            e.clientY >= tr.top - 14 &&
-            e.clientY <= tr.bottom + 14;
+            e.clientX >= tr.left - 16 &&
+            e.clientX <= tr.right + 16 &&
+            e.clientY >= tr.top - 16 &&
+            e.clientY <= tr.bottom + 16;
           targetEl.classList.toggle("drag-over", hit);
         };
 
@@ -1058,10 +959,10 @@
 
           const tr = targetEl.getBoundingClientRect();
           const hit =
-            e.clientX >= tr.left - 14 &&
-            e.clientX <= tr.right + 14 &&
-            e.clientY >= tr.top - 14 &&
-            e.clientY <= tr.bottom + 14;
+            e.clientX >= tr.left - 16 &&
+            e.clientX <= tr.right + 16 &&
+            e.clientY >= tr.top - 16 &&
+            e.clientY <= tr.bottom + 16;
 
           if (!moved || hit) {
             onSuccess();
@@ -1074,18 +975,11 @@
         window.addEventListener("pointerup", onUp);
         window.addEventListener("pointercancel", onUp);
 
-        // 다음 스테이지 렌더링 시 전역 리스너 정리 등록
         cleanupFns.push(() => {
           window.removeEventListener("pointermove", onMove);
           window.removeEventListener("pointerup", onUp);
           window.removeEventListener("pointercancel", onUp);
         });
-      }
-
-      let cleanupFns = [];
-      function runCleanups() {
-        cleanupFns.forEach(fn => fn());
-        cleanupFns = [];
       }
 
       function renderStage() {
@@ -1102,14 +996,13 @@
         updateHeaderAndSide();
 
         if (stage === 0 || stage === 2) {
-          // 1공정 원두 분쇄 / 3공정 내피 밀봉
           const isGrind = stage === 0;
           const sweetLeft = isGrind ? 40 : 41;
           const sweetWidth = isGrind ? 20 : 18;
           const speed = isGrind ? 1550 : 1400;
 
           taskCanvas.innerHTML = `
-            <div style="font-size:42px;line-height:1;">${isGrind ? "🫘 ⚙️" : "☕ 🔥"}</div>
+            <div style="font-size:clamp(30px, 5vw, 42px);line-height:1;">${isGrind ? "🫘 ⚙️" : "☕ 🔥"}</div>
             <div class="gauge-wrap">
               <div class="gauge-bar">
                 <div class="sweet-zone" style="left:${sweetLeft}%;width:${sweetWidth}%;"></div>
@@ -1117,7 +1010,7 @@
               </div>
               <div class="gauge-hints">
                 <span>${isGrind ? "거침" : "약한 열"}</span>
-                <strong>초록 구간에 정확히 정지!</strong>
+                <strong>초록 구간에 정지!</strong>
                 <span>${isGrind ? "지나침" : "과열"}</span>
               </div>
             </div>
@@ -1126,8 +1019,7 @@
             </button>
           `;
 
-          const needleEl = document.getElementById("needle");
-          startGaugeLoop(speed, needleEl);
+          startGaugeLoop(speed, document.getElementById("needle"));
 
           document.getElementById("btnStop").addEventListener("click", () => {
             stopRaf();
@@ -1145,16 +1037,14 @@
             renderStage();
           });
         } else if (stage === 1) {
-          // 2공정 11g 소분
           grams = [7, 8, 9, 13, 14][Math.floor(Math.random() * 5)];
           renderScaleUI();
         } else if (stage === 3) {
-          // 4공정 외피 라벨 드래그 & 드롭
           taskCanvas.innerHTML = `
             <div class="label-stage">
               <div class="pouch-target" id="pouchTarget">
-                <div style="font-size:34px;">☕</div>
-                <div class="pouch-slot" id="pouchSlot">여기에<br /><strong>${blend.key}</strong> 라벨 부착</div>
+                <div style="font-size:28px;">☕</div>
+                <div class="pouch-slot"><strong>${blend.key}</strong><br />라벨 부착</div>
               </div>
               <div class="label-rack" id="labelRack"></div>
             </div>
@@ -1166,7 +1056,7 @@
             const el = document.createElement("div");
             el.className = "drag-label";
             el.style.background = opt.color;
-            el.innerHTML = `<span>🏷️</span><span>${opt.emoji} ${opt.key} (${opt.name})</span>`;
+            el.innerHTML = `<span>🏷️</span><span>${opt.emoji} ${opt.key} (${opt.short})</span>`;
             labelRack.appendChild(el);
 
             bindDragOrTap(
@@ -1175,53 +1065,45 @@
               () => {
                 if (opt.key === blend.key) {
                   curParts.push(100);
-                  setFeedback(`🏷️ [${blend.name}] 라벨이 정확히 부착되었어요!`);
+                  setFeedback(`🏷️ [${blend.name}] 라벨 부착 완료!`);
                   stage++;
                   renderStage();
                 } else {
-                  setFeedback(`⚠️ 주문서는 [${blend.name} (${blend.key})]입니다! 라벨을 다시 확인해 주세요.`, true);
+                  setFeedback(`⚠️ 주문은 [${blend.name} (${blend.key})]입니다!`, true);
                 }
               },
-              () => {
-                setFeedback("👉 라벨을 왼쪽 드립백 파우치 위로 놓아주세요.");
-              }
+              () => setFeedback("👉 라벨을 드립백 파우치 위로 놓거나 탭하세요.")
             );
           });
         } else if (stage === 4) {
-          // 5공정 선물 상자 담기 (드래그 & 드롭)
           const qPreview = currentAvgOfParts() || 100;
           taskCanvas.innerHTML = `
             <div class="box-stage">
               <div class="finished-bag" id="finishedBag">
-                <div style="font-size:36px;">${blend.emoji}</div>
+                <div style="font-size:32px;">${blend.emoji}</div>
                 <span class="bag-sticker" style="background:${blend.color}">${blend.key}</span>
-                <span style="font-size:12px;color:#5a6a79;">품질 ${qPreview}%</span>
+                <span style="font-size:11px;color:#5a6a79;">품질 ${qPreview}%</span>
               </div>
-              <div style="font-size:24px;color:#8e795e;">➡️</div>
+              <div class="box-arrow" style="font-size:22px;color:#8e795e;">➡️</div>
               <div class="gift-box-drop" id="giftBoxDrop">
-                <div style="font-size:14px;">🎁 드립백 선물세트 (${completedBags.length}/3)</div>
+                <div style="font-size:13px;">🎁 드립백 선물세트 (${completedBags.length}/3)</div>
                 <div class="box-slots" id="boxSlots"></div>
               </div>
             </div>
           `;
 
-          const slotsEl = document.getElementById("boxSlots");
-          slotsEl.innerHTML = BLENDS.map((b, i) => {
+          document.getElementById("boxSlots").innerHTML = BLENDS.map((b, i) => {
             const filled = completedBags[i];
-            if (filled) {
-              return `<div class="box-slot filled"><span style="font-size:20px;">${b.emoji}</span><span>${b.key}</span></div>`;
-            }
-            return `<div class="box-slot"><span>${i + 1}번</span></div>`;
+            return filled
+              ? `<div class="box-slot filled"><span style="font-size:18px;">${b.emoji}</span><span>${b.key}</span></div>`
+              : `<div class="box-slot"><span>${i + 1}번</span></div>`;
           }).join("");
 
-          const finishedBagEl = document.getElementById("finishedBag");
-          const giftBoxEl = document.getElementById("giftBoxDrop");
-
           bindDragOrTap(
-            finishedBagEl,
-            giftBoxEl,
+            document.getElementById("finishedBag"),
+            document.getElementById("giftBoxDrop"),
             () => packCurrentBag(),
-            () => setFeedback("👉 완성된 드립백을 오른쪽 선물 상자로 옮겨주세요.")
+            () => setFeedback("👉 완성된 드립백을 선물 상자로 옮기거나 탭하세요.")
           );
         }
       }
@@ -1233,11 +1115,11 @@
           <div class="scale-box">
             <div class="scale-display ${isExact ? "exact" : ""}">${grams}g</div>
             <div class="gauge-wrap" style="max-width:360px;">
-              <div class="gauge-bar" style="height:26px;">
+              <div class="gauge-bar" style="height:24px;">
                 <div class="sweet-zone" style="left:45%;width:10%;"></div>
                 <div class="needle" style="left:${pct}%;"></div>
               </div>
-              <div class="gauge-hints"><span>5g</span><strong>목표: 정확히 11g</strong><span>17g</span></div>
+              <div class="gauge-hints"><span>5g</span><strong>목표: 11g</strong><span>17g</span></div>
             </div>
             <div class="gram-controls">
               <button type="button" class="action-btn sub" id="gMinus2">− 2g</button>
@@ -1263,9 +1145,7 @@
           const score = Math.max(50, 100 - diff * 20);
           curParts.push(score);
           setFeedback(
-            diff === 0
-              ? "⚖️ 정확히 11g 계량 완료! 품질 100%"
-              : `⚖️ ${grams}g으로 소분했어요. (품질 ${score}%)`,
+            diff === 0 ? "⚖️ 정확히 11g 계량 완료! 품질 100%" : `⚖️ ${grams}g 소분 완료 (품질 ${score}%)`,
             diff > 1
           );
           stage++;
@@ -1276,7 +1156,7 @@
       function packCurrentBag() {
         const blend = BLENDS[bagIdx];
         const q = currentAvgOfParts() || 100;
-        const payout = Math.round(800 + q * 4); // 봉당 최대 1,200원
+        const payout = Math.round(800 + q * 4);
 
         completedBags.push({ blend, quality: q, payout });
         totalCash += payout;
@@ -1287,7 +1167,7 @@
         } else {
           bagIdx++;
           stage = 0;
-          setFeedback(`📦 [${blend.name}] 포장 완료! (+${payout.toLocaleString("ko-KR")}원) 다음 원두를 작업해 주세요.`);
+          setFeedback(`📦 [${blend.name}] 포장 완료! (+${payout.toLocaleString("ko-KR")}원) 다음 원두를 작업하세요.`);
           renderStage();
         }
       }
@@ -1297,10 +1177,7 @@
         runCleanups();
         updateHeaderAndSide();
 
-        const avgAll = Math.round(
-          completedBags.reduce((s, b) => s + b.quality, 0) / completedBags.length
-        );
-
+        const avgAll = Math.round(completedBags.reduce((s, b) => s + b.quality, 0) / completedBags.length);
         finalQualityEl.textContent = `${avgAll}% (${gradeLabel(avgAll)})`;
         finalCashEl.textContent = `${totalCash.toLocaleString("ko-KR")}원`;
         setFeedback("🎉 드립백 3봉 선물세트가 완성되어 출고되었습니다!");
@@ -1333,7 +1210,7 @@
         totalCash = 0;
         clearSent = false;
         clearModal.classList.remove("open");
-        setFeedback("정성을 담아 센터 드립백 3봉 선물세트를 완성해 보세요!");
+        setFeedback("정성을 담아 드립백 3봉 선물세트를 완성해 보세요!");
         renderStage();
       }
 

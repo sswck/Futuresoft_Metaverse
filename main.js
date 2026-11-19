@@ -1,23 +1,22 @@
-// 미니게임 기본 설정 매핑
+// GAMES 정의에 mobile 크기 추가
 const GAMES = {
     tidy: {
         file: "room-tidy.html",
         title: "🌤️ 오늘의 한 걸음 · 방 정돈",
         width: 960,
         height: 680,
-    },
-    cafe: {
-        file: "cafe-tycoon.html",
-        title: "☕ 청춘 카페 타이쿤",
-        width: 1020,
-        height: 760,
+        mWidth: 360,
+        mHeight: 580,
     },
     dripbag: {
         file: "dripbag-tycoon.html",
         title: "📦 미래 제작소 (드립백 제조)",
         width: 1020,
         height: 740,
+        mWidth: 360,
+        mHeight: 580,
     },
+    // 1안(미래소프트 신규 게임) 제작 후 여기에 추가
 };
 
 // 위젯 닫기 공통 함수
@@ -41,7 +40,9 @@ function startMiniGame(player, gameKey) {
         player.tag = {};
     }
 
-    player.tag.widget = player.showWidget(game.file, "middle", game.width, game.height);
+    const w = player.isMobile ? game.mWidth : game.width;
+    const h = player.isMobile ? game.mHeight : game.height;
+    player.tag.widget = player.showWidget(game.file, "middle", w, h);
     player.sendMessage(`${game.title} 미니게임을 시작합니다! (종료: /닫기)`, 0xffd740);
 
     // 위젯 내부 통신 이벤트 수신
