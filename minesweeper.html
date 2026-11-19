@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <style>
+            body {
+                background-color: rgba(30, 30, 40, 0.95);
+                color: #fff;
+                font-family: "Malgun Gothic", sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                border: 2px solid #555;
+                box-sizing: border-box;
+                border-radius: 12px;
+            }
+            h3 {
+                margin: 0 0 5px 0;
+                color: #ffd700;
+            }
+            p {
+                margin: 0 0 15px 0;
+                font-size: 13px;
+                color: #ccc;
+            }
+            #board {
+                display: grid;
+                grid-template-columns: repeat(5, 45px);
+                gap: 5px;
+                margin-bottom: 15px;
+            }
+            .cell {
+                width: 45px;
+                height: 45px;
+                background-color: #4a4a5a;
+                border: 2px solid #6a6a7a;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 18px;
+                cursor: pointer;
+                user-select: none;
+            }
+            .cell:hover {
+                background-color: #5a5a6a;
+            }
+            .cell.revealed {
+                background-color: #2a2a35;
+                border-color: #3a3a45;
+                cursor: default;
+            }
+            .cell.mine {
+                background-color: #e74c3c;
+            }
+            .btn-group {
+                display: flex;
+                gap: 10px;
+            }
+            button {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+                background-color: #3498db;
+                color: white;
+            }
+            button.close {
+                background-color: #7f8c8d;
+            }
+        </style>
+    </head>
+    <body>
+        <h3>💣 미니 지뢰찾기</h3>
+        <p>지뢰(3개)를 피해 안전한 칸을 모두 여세요!</p>
+        <div id="board"></div>
+        <div class="btn-group">
+            <button onclick="initGame()">다시하기</button>
+            <button class="close" onclick="closeGame()">닫기</button>
+        </div>
+
+        <script>
+            const SIZE = 5;
+            const MINES = 3;
+            let board = [];
+            let revealedCount = 0;
+            let gameOver = false;
+
+            function initGame() {
+                const boardEl = document.getElementById("board");
+                boardEl.innerHTML = "";
+                board = Array(SIZE * SIZE).fill(0);
+                revealedCount = 0;
+                gameOver = false;
+
+                // 지뢰 랜덤 배치 (-1은 지뢰)
+                let planted = 0;
+                while (planted < MINES) {
+                    let idx = Math.floor(Math.random() * (SIZE * SIZE));
+                    if (board[idx] !== -1) {
+                        board[idx] = -1;
+                        planted++;
+                    }
+                }
+
+                // 주변 지뢰 개수 계산
+                for (let i = 0; i < SIZE * SIZE; i++) {
+                    if (board[i] === -1) continue;
+                    let count = 0;
+                    let r = Math.floor(i / SIZE),
+                        c = i % SIZE;
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            let nr = r + dr,
+                                nc = c + dc;
+                            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+                                if (board[nr * SIZE + nc] === -1) count++;
+                            }
+                        }
+                    }
+                    board[i] = count;
+                }
+
+                // 화면에 셀 생성
+                for (let i = 0; i < SIZE * SIZE; i++) {
+                    const cell = document.createElement("div");
+                    cell.className = "cell";
+                    cell.onclick = () => clickCell(i, cell);
+                    boardEl.appendChild(cell);
+                }
+            }
+
+            function clickCell(idx, cellEl) {
+                if (gameOver || cellEl.classList.contains("revealed")) return;
+                cellEl.classList.add("revealed");
+
+                if (board[idx] === -1) {
+                    cellEl.classList.add("mine");
+                    cellEl.innerText = "💣";
+                    gameOver = true;
+                    setTimeout(() => alert("💥 지뢰를 밟았습니다! 다시 도전해보세요."), 100);
+                } else {
+                    cellEl.innerText = board[idx] > 0 ? board[idx] : "";
+                    revealedCount++;
+                    // 승리 조건 체크
+                    if (revealedCount === SIZE * SIZE - MINES) {
+                        gameOver = true;
+                        setTimeout(() => {
+                            alert("🎉 클리어! 단서를 획득했습니다.");
+                            // ZEP 스크립트로 클리어 신호 전송
+                            window.parent.postMessage({ type: "CLEAR" }, "*");
+                        }, 100);
+                    }
+                }
+            }
+
+            function closeGame() {
+                // ZEP 스크립트로 닫기 신호 전송
+                window.parent.postMessage({ type: "CLOSE" }, "*");
+            }
+
+            initGame();
+        </script>
+    </body>
+</html>

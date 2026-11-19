@@ -1,0 +1,1265 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>오늘의 한 걸음 · 아침 방 정돈</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
+
+    :root {
+      --ink: #223343;
+      --paper: #f3ead8;
+      --cream: #fff8ea;
+      --wall: #efe0c1;
+      --floor: #d9b17e;
+      --floor-line: #c99d68;
+      --orange: #ff985e;
+      --mint: #79d8b0;
+      --mint-dark: #3f7d60;
+      --gold: #ffcf56;
+      --danger: #e46c5c;
+      --shadow: rgba(34, 51, 67, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 8px;
+      background-image: radial-gradient(#d8c7aa 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+
+    /* 상단 HUD */
+    .hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--cream);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: 0 4px 0 #cbbba0;
+      flex-shrink: 0;
+    }
+
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      font-size: clamp(16px, 2.2vw, 22px);
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+    }
+    .title span {
+      color: #e6764c;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #fffdf8;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      font-size: clamp(12px, 1.5vw, 15px);
+      white-space: nowrap;
+    }
+
+    .meter {
+      width: clamp(70px, 12vw, 130px);
+      height: 12px;
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      background: #e8dec9;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      background: repeating-linear-gradient(90deg, #79d8b0 0 10px, #5ec499 10px 14px);
+      transition: width 0.25s ease;
+    }
+
+    .key-pill {
+      background: #f2ece0;
+      color: #667584;
+      transition: all 0.25s ease;
+    }
+    .key-pill.found {
+      background: #fff1b8;
+      color: #8a5600;
+      border-color: #c28715;
+    }
+    .key-pill.acquired {
+      background: #d2f5e3;
+      color: #215c42;
+      border-color: #2f7d5b;
+    }
+
+    .hud-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-icon {
+      border: 2.5px solid var(--ink);
+      border-radius: 8px;
+      background: #fffdf7;
+      color: var(--ink);
+      padding: 5px 11px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--ink);
+      transition: transform 0.08s, box-shadow 0.08s, background 0.12s;
+      white-space: nowrap;
+    }
+    .btn-icon:hover {
+      background: #ffe8d6;
+    }
+    .btn-icon:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--ink);
+    }
+    .btn-close-top {
+      background: #f5d8d0;
+    }
+    .btn-close-top:hover {
+      background: #ffbfb0;
+    }
+
+    /* 안내 배너 */
+    .guide-bar {
+      text-align: center;
+      padding: 6px 12px;
+      background: var(--cream);
+      border: 2.5px solid var(--ink);
+      border-radius: 8px;
+      font-size: clamp(13px, 1.6vw, 15px);
+      color: #354b5e;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .guide-bar.warn {
+      background: #ffe6df;
+      color: #a93b2d;
+    }
+    .guide-bar.good {
+      background: #dff8eb;
+      color: #225e43;
+    }
+
+    /* 메인 방 스테이지 */
+    .stage {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      border: 4px solid var(--ink);
+      border-radius: 14px;
+      overflow: hidden;
+      background:
+        linear-gradient(
+          to bottom,
+          #cde8f7 0% 4%,
+          #f6e9cc 4% 28%,
+          #a87f54 28% 30%,
+          var(--floor) 30% 100%
+        );
+      box-shadow: 0 6px 0 #c6b69a;
+      touch-action: none;
+    }
+
+    /* 바닥 마루 무늬 */
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 30% 0 0 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent 0 28px,
+          rgba(120, 80, 40, 0.12) 28px 30px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0 88px,
+          rgba(120, 80, 40, 0.08) 88px 90px
+        );
+      pointer-events: none;
+    }
+
+    /* 아침 창문 + 햇살 */
+    .morning-window {
+      position: absolute;
+      left: 50%;
+      top: 3%;
+      transform: translateX(-50%);
+      width: clamp(130px, 22%, 210px);
+      height: 22%;
+      border: 5px solid var(--ink);
+      border-radius: 4px;
+      background: linear-gradient(180deg, #9be0f7 0% 62%, #85c188 62% 100%);
+      box-shadow: 4px 4px 0 rgba(105, 76, 52, 0.4);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .morning-window::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      transform: translateX(-50%);
+      background: #fff4d6;
+      border-left: 1.5px solid var(--ink);
+      border-right: 1.5px solid var(--ink);
+    }
+    .morning-window::after {
+      content: "";
+      position: absolute;
+      top: 52%;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: #fff4d6;
+      border-top: 1.5px solid var(--ink);
+      border-bottom: 1.5px solid var(--ink);
+    }
+
+    .sunbeam {
+      position: absolute;
+      left: 50%;
+      top: 24%;
+      transform: translateX(-50%);
+      width: 44%;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255, 246, 189, 0.38), rgba(255, 246, 189, 0));
+      clip-path: polygon(22% 0%, 78% 0%, 100% 100%, 0% 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 중앙 러그 */
+    .rug {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      transform: translate(-50%, -50%);
+      width: 46%;
+      height: 46%;
+      background: #f5ebd5;
+      border: 4px dashed #c8a97e;
+      border-radius: 20px;
+      box-shadow: inset 0 0 0 8px #eedec0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .rug-label {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #9e8462;
+      white-space: nowrap;
+      opacity: 0.85;
+    }
+
+    /* 드롭 구역 공통 */
+    .drop-zone {
+      position: absolute;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 6px;
+      background: rgba(255, 248, 234, 0.92);
+      border: 3.5px solid var(--ink);
+      border-radius: 12px;
+      box-shadow: 0 5px 0 rgba(34, 51, 67, 0.25);
+      transition: transform 0.14s ease, background 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+    }
+
+    .drop-zone.drag-over {
+      transform: scale(1.04);
+      background: #e3faee;
+      border-color: var(--mint-dark);
+      box-shadow: 0 0 0 4px rgba(121, 216, 176, 0.55), 0 6px 0 rgba(34, 51, 67, 0.25);
+    }
+
+    .drop-zone.wrong-flash {
+      background: #ffe0da;
+      border-color: var(--danger);
+      animation: shake 0.3s ease;
+    }
+
+    .zone-title {
+      font-size: clamp(12px, 1.55vw, 15px);
+      background: var(--cream);
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
+    .zone-art {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      padding: 2px;
+    }
+
+    .zone-art svg {
+      max-width: 86%;
+      max-height: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .zone-collected {
+      display: flex;
+      gap: 4px;
+      min-height: 22px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .mini-chip {
+      font-size: 16px;
+      line-height: 1;
+      background: #fff;
+      border: 1.5px solid var(--ink);
+      border-radius: 6px;
+      padding: 2px 4px;
+      animation: popIn 0.28s cubic-bezier(0.2, 1.4, 0.4, 1);
+    }
+
+    /* 5개 구역 배치 */
+    .zone-bed     { left: 2.5%;  top: 6%;    width: 24%; height: 41%; }
+    .zone-laundry { left: 2.5%;  bottom: 4%; width: 24%; height: 41%; }
+    .zone-desk    { right: 2.5%; top: 6%;    width: 24%; height: 41%; }
+    .zone-trash   { right: 2.5%; bottom: 4%; width: 24%; height: 41%; }
+    .zone-door    { left: 50%;   bottom: 3%; width: 32%; height: 21%; transform: translateX(-50%); flex-direction: row; padding: 6px 12px; gap: 8px; }
+    .zone-door.drag-over { transform: translateX(-50%) scale(1.04); }
+
+    .zone-door .zone-art {
+      flex: 0 0 auto;
+      width: 54px;
+      height: 100%;
+    }
+    .zone-door .door-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      flex: 1;
+    }
+    .door-status {
+      font-size: 11px;
+      color: #6b7a89;
+    }
+    .zone-door.unlocked {
+      background: #e1faec;
+      border-color: var(--mint-dark);
+    }
+    .zone-door.unlocked .door-status {
+      color: #216649;
+    }
+
+    /* 숨겨진 열쇠 (스택 1 아래) */
+    .hidden-key {
+      position: absolute;
+      left: 36%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0.75);
+      width: clamp(58px, 7.5vw, 76px);
+      height: clamp(58px, 7.5vw, 76px);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+      pointer-events: none;
+      opacity: 0.35;
+      transition: transform 0.35s cubic-bezier(0.2, 1.5, 0.4, 1), opacity 0.3s;
+    }
+
+    .hidden-key .key-icon {
+      font-size: clamp(28px, 4vw, 38px);
+      filter: drop-shadow(0 3px 0 rgba(34, 51, 67, 0.35));
+    }
+
+    .hidden-key .key-tag {
+      margin-top: -2px;
+      font-size: 10px;
+      background: #fff3b0;
+      border: 1.5px solid var(--ink);
+      border-radius: 99px;
+      padding: 1px 6px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .hidden-key.revealed {
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+      transform: translate(-50%, -50%) scale(1.05);
+      background: radial-gradient(circle, rgba(255, 224, 102, 0.85) 0%, rgba(255, 224, 102, 0) 72%);
+      animation: keyPulse 1.3s ease-in-out infinite;
+    }
+
+    .hidden-key.revealed .key-tag {
+      opacity: 1;
+    }
+
+    .hidden-key.acquired {
+      animation: keyFly 0.65s ease forwards;
+      pointer-events: none;
+    }
+
+    /* 드래그 아이템 */
+    .drag-item {
+      position: absolute;
+      width: clamp(64px, 8.2vw, 84px);
+      height: clamp(64px, 8.2vw, 84px);
+      transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: #fffdf6;
+      border: 3px solid var(--ink);
+      border-radius: 14px;
+      box-shadow: 0 5px 0 rgba(34, 51, 67, 0.3);
+      cursor: grab;
+      touch-action: none;
+      transition: transform 0.2s cubic-bezier(0.2, 1.4, 0.4, 1), filter 0.2s, box-shadow 0.15s;
+    }
+
+    .drag-item .emoji {
+      font-size: clamp(26px, 3.6vw, 35px);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .drag-item .item-label {
+      font-size: clamp(10px, 1.15vw, 12px);
+      color: var(--ink);
+      background: #f5ebd4;
+      padding: 1px 6px;
+      border-radius: 5px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* 아래에 깔려 잠긴 상태 */
+    .drag-item.covered {
+      filter: brightness(0.86) saturate(0.85);
+      cursor: not-allowed;
+      box-shadow: 0 3px 0 rgba(34, 51, 67, 0.22);
+    }
+
+    .drag-item.covered .item-label {
+      opacity: 0.7;
+    }
+
+    /* 맨 위(드래그 가능) 뱃지 */
+    .drag-item:not(.covered):hover {
+      transform: translate(-50%, -53%) rotate(0deg) scale(1.06);
+      border-color: #e6764c;
+    }
+
+    .drag-item.dragging {
+      cursor: grabbing;
+      z-index: 200 !important;
+      transition: none !important;
+      transform: translate(-50%, -50%) scale(1.12) rotate(0deg) !important;
+      box-shadow: 0 14px 22px rgba(34, 51, 67, 0.34);
+      border-color: #e6764c;
+    }
+
+    .drag-item.returning {
+      transition: left 0.24s ease, top 0.24s ease, transform 0.24s ease !important;
+    }
+
+    .drag-item.locked-shake {
+      animation: itemShake 0.28s ease;
+    }
+
+    .drag-item.uncover-pop {
+      animation: uncoverPop 0.35s cubic-bezier(0.2, 1.5, 0.4, 1);
+    }
+
+    /* 스택 힌트 표시 */
+    .stack-badge {
+      position: absolute;
+      top: -9px;
+      right: -8px;
+      font-size: 10px;
+      background: var(--gold);
+      border: 2px solid var(--ink);
+      border-radius: 99px;
+      padding: 1px 6px;
+      color: var(--ink);
+      pointer-events: none;
+      box-shadow: 0 2px 0 rgba(34, 51, 67, 0.25);
+    }
+
+    /* 플로팅 피드백 텍스트 */
+    .float-text {
+      position: absolute;
+      z-index: 250;
+      pointer-events: none;
+      font-size: 16px;
+      color: #1f6b49;
+      background: #fffdf5;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      padding: 3px 9px;
+      transform: translate(-50%, -50%);
+      animation: floatUp 0.75s ease forwards;
+      white-space: nowrap;
+    }
+
+    /* 클리어 모달 */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 300;
+      display: none;
+      place-items: center;
+      padding: 16px;
+      background: rgba(20, 34, 48, 0.62);
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+      animation: fadeIn 0.22s ease;
+    }
+
+    .modal-card {
+      width: min(420px, 92%);
+      padding: 24px 22px 20px;
+      background: var(--cream);
+      border: 5px solid var(--ink);
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 10px 0 rgba(20, 34, 48, 0.45);
+      background-image: radial-gradient(#dfd0b6 1px, transparent 1px);
+      background-size: 14px 14px;
+      animation: modalPop 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+    }
+
+    .modal-key-art {
+      font-size: 58px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      animation: keyBounce 1.1s ease-in-out infinite;
+    }
+
+    .modal-card h2 {
+      margin: 4px 0 8px;
+      font-size: clamp(24px, 4vw, 30px);
+      color: var(--ink);
+      text-shadow: 2px 2px #c8ebd7;
+    }
+
+    .modal-card p {
+      margin: 0 0 18px;
+      font-size: 15px;
+      line-height: 1.55;
+      color: #4b5d6d;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary, .btn-secondary {
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      padding: 10px 24px;
+      font-family: inherit;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--ink);
+      transition: transform 0.08s, box-shadow 0.08s;
+    }
+    .btn-primary {
+      background: var(--orange);
+      color: var(--ink);
+    }
+    .btn-secondary {
+      background: #e9dfc9;
+      color: var(--ink);
+      font-size: 15px;
+      padding: 10px 16px;
+    }
+    .btn-primary:active, .btn-secondary:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 var(--ink);
+    }
+
+    /* 브라우저 단독 테스트 토스트 */
+    .standalone-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 400;
+      background: #223343;
+      color: #fff8ea;
+      padding: 8px 16px;
+      border-radius: 99px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .standalone-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes shake {
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    @keyframes itemShake {
+      25% { transform: translate(-54%, -50%) rotate(var(--rot, 0deg)); }
+      75% { transform: translate(-46%, -50%) rotate(var(--rot, 0deg)); }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes uncoverPop {
+      0% { transform: translate(-50%, -50%) scale(0.88) rotate(var(--rot, 0deg)); }
+      60% { transform: translate(-50%, -54%) scale(1.08) rotate(var(--rot, 0deg)); }
+      100% { transform: translate(-50%, -50%) scale(1) rotate(var(--rot, 0deg)); }
+    }
+    @keyframes keyPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1.02); }
+      50% { transform: translate(-50%, -56%) scale(1.14); }
+    }
+    @keyframes keyFly {
+      0% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+      100% { transform: translate(-50%, -150%) scale(1.8); opacity: 0; }
+    }
+    @keyframes keyBounce {
+      0%, 100% { transform: translateY(0) rotate(-6deg); }
+      50% { transform: translateY(-7px) rotate(6deg); }
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.9); }
+      100% { opacity: 0; transform: translate(-50%, -140%) scale(1.08); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.86); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 640px) {
+      .app { padding: 6px; gap: 6px; }
+      .hud { padding: 6px 8px; }
+      .meter { display: none; }
+      .zone-bed, .zone-laundry, .zone-desk, .zone-trash { width: 26%; height: 38%; }
+      .zone-door { width: 40%; height: 19%; padding: 4px 8px; }
+      .zone-door .zone-art { width: 38px; }
+      .rug { width: 44%; height: 42%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- 상단 바 -->
+    <header class="hud">
+      <div class="hud-left">
+        <div class="title">🌤️ 오늘의 한 걸음 <span>· 방 정돈</span></div>
+        <div class="pill">
+          <span>🧺 정리</span>
+          <strong id="progressText">0 / 9</strong>
+          <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+        </div>
+        <div class="pill key-pill" id="keyPill">🔒 열쇠 찾는 중</div>
+      </div>
+      <div class="hud-right">
+        <button type="button" class="btn-icon" id="btnReset" title="처음부터 다시 정리하기">↻ 다시</button>
+        <button type="button" class="btn-icon btn-close-top" id="btnCloseTop">✕ 닫기</button>
+      </div>
+    </header>
+
+    <!-- 안내 문구 -->
+    <div class="guide-bar" id="guideBar">
+      ☀️ 아침이 밝았어요! 쌓여 있는 물건을 위에서부터 알맞은 구역으로 드래그해 정리하고 현관 열쇠(🔑)를 찾아보세요.
+    </div>
+
+    <!-- 메인 방 영역 -->
+    <main class="stage" id="stage">
+      <div class="morning-window" aria-hidden="true"></div>
+      <div class="sunbeam" aria-hidden="true"></div>
+      <div class="rug" aria-hidden="true">
+        <span class="rug-label">위 물건부터 치워 아래를 확인하세요</span>
+      </div>
+
+      <!-- 구역 1: 침대 -->
+      <section class="drop-zone zone-bed" data-zone="bed">
+        <div class="zone-title">🛏️ 침대</div>
+        <div class="zone-art" aria-hidden="true">
+          <svg viewBox="0 0 120 72">
+            <rect x="8" y="18" width="104" height="46" rx="8" fill="#8b6248" stroke="#223343" stroke-width="4"/>
+            <rect x="14" y="10" width="92" height="44" rx="6" fill="#fff6de" stroke="#223343" stroke-width="4"/>
+            <rect x="20" y="16" width="30" height="16" rx="5" fill="#bfe3dc" stroke="#223343" stroke-width="3"/>
+            <rect x="14" y="34" width="92" height="20" rx="4" fill="#e5997d" stroke="#223343" stroke-width="3.5"/>
+          </svg>
+        </div>
+        <div class="zone-collected" id="collected-bed"></div>
+      </section>
+
+      <!-- 구역 2: 빨래바구니 -->
+      <section class="drop-zone zone-laundry" data-zone="laundry">
+        <div class="zone-title">🧺 빨래바구니</div>
+        <div class="zone-art" aria-hidden="true">
+          <svg viewBox="0 0 100 76">
+            <path d="M16 20 L84 20 L76 66 L24 66 Z" fill="#d99a64" stroke="#223343" stroke-width="4" stroke-linejoin="round"/>
+            <rect x="12" y="12" width="76" height="10" rx="4" fill="#c07f4a" stroke="#223343" stroke-width="4"/>
+            <line x1="34" y1="24" x2="38" y2="62" stroke="#223343" stroke-width="3"/>
+            <line x1="50" y1="24" x2="50" y2="62" stroke="#223343" stroke-width="3"/>
+            <line x1="66" y1="24" x2="62" y2="62" stroke="#223343" stroke-width="3"/>
+          </svg>
+        </div>
+        <div class="zone-collected" id="collected-laundry"></div>
+      </section>
+
+      <!-- 구역 3: 책상 선반 -->
+      <section class="drop-zone zone-desk" data-zone="desk">
+        <div class="zone-title">📚 책상 선반</div>
+        <div class="zone-art" aria-hidden="true">
+          <svg viewBox="0 0 120 74">
+            <rect x="10" y="18" width="100" height="12" rx="3" fill="#b98356" stroke="#223343" stroke-width="4"/>
+            <rect x="18" y="30" width="10" height="36" fill="#8f603e" stroke="#223343" stroke-width="4"/>
+            <rect x="92" y="30" width="10" height="36" fill="#8f603e" stroke="#223343" stroke-width="4"/>
+            <rect x="74" y="30" width="18" height="24" fill="#d7a473" stroke="#223343" stroke-width="3.5"/>
+            <circle cx="83" cy="42" r="2.5" fill="#223343"/>
+          </svg>
+        </div>
+        <div class="zone-collected" id="collected-desk"></div>
+      </section>
+
+      <!-- 구역 4: 쓰레기통 -->
+      <section class="drop-zone zone-trash" data-zone="trash">
+        <div class="zone-title">🗑️ 쓰레기통</div>
+        <div class="zone-art" aria-hidden="true">
+          <svg viewBox="0 0 96 76">
+            <path d="M24 22 L72 22 L66 68 L30 68 Z" fill="#8fa7b8" stroke="#223343" stroke-width="4" stroke-linejoin="round"/>
+            <rect x="18" y="13" width="60" height="9" rx="3" fill="#6f899c" stroke="#223343" stroke-width="4"/>
+            <rect x="38" y="6" width="20" height="7" rx="2" fill="#6f899c" stroke="#223343" stroke-width="3.5"/>
+            <line x1="39" y1="30" x2="41" y2="60" stroke="#223343" stroke-width="3"/>
+            <line x1="57" y1="30" x2="55" y2="60" stroke="#223343" stroke-width="3"/>
+          </svg>
+        </div>
+        <div class="zone-collected" id="collected-trash"></div>
+      </section>
+
+      <!-- 구역 5: 현관 매트 -->
+      <section class="drop-zone zone-door" data-zone="door" id="zoneDoor">
+        <div class="zone-art" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <rect x="10" y="6" width="44" height="52" rx="4" fill="#b77e53" stroke="#223343" stroke-width="4"/>
+            <rect x="18" y="14" width="28" height="18" rx="2" fill="#9bd8e8" stroke="#223343" stroke-width="3"/>
+            <circle cx="44" cy="40" r="4" fill="#ffcf56" stroke="#223343" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="door-meta">
+          <div class="zone-title">🚪 현관 매트</div>
+          <div class="door-status" id="doorStatus">🔒 열쇠가 필요해요</div>
+        </div>
+        <div class="zone-collected" id="collected-door"></div>
+      </section>
+
+      <!-- 스택 1 아래 숨겨진 현관 열쇠 -->
+      <div class="hidden-key" id="hiddenKey" role="button" tabindex="-1" aria-label="숨겨진 현관 열쇠">
+        <div class="key-icon">🔑</div>
+        <div class="key-tag" id="keyTag">열쇠 발견!</div>
+      </div>
+
+      <!-- 드래그 물건들이 동적으로 렌더링되는 레이어 -->
+      <div id="itemsLayer"></div>
+
+      <!-- 열쇠 획득 축하 모달 -->
+      <div class="modal-backdrop" id="clearModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-card">
+          <div class="modal-key-art">🔑✨</div>
+          <h2 id="modalTitle">열쇠를 얻었다!</h2>
+          <p>
+            방 안의 물건을 모두 제자리에 정돈하고<br />
+            더미 아래 숨어 있던 <strong>현관 열쇠</strong>를 찾았어요.<br />
+            이제 문을 열고 밖으로 나가 볼까요?
+          </p>
+          <div class="modal-actions">
+            <button type="button" class="btn-primary" id="btnCloseModal">닫기</button>
+            <button type="button" class="btn-secondary" id="btnReplay">다시 정돈하기 ↻</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="standalone-toast" id="standaloneToast"></div>
+
+  <script>
+    (() => {
+      const ZONE_LABELS = {
+        bed: "🛏️ 침대",
+        laundry: "🧺 빨래바구니",
+        desk: "📚 책상 선반",
+        trash: "🗑️ 쓰레기통",
+        door: "🚪 현관 매트"
+      };
+
+      // 3개의 스택(각 3층 = 총 9개 물건). stack "A"의 맨 아래에 현관 열쇠가 숨어 있음.
+      const ITEM_DEFS = [
+        // Stack A (왼쪽 중앙: 침대/빨래 더미 -> 아래에 🔑 숨김)
+        { id: "cushion",  name: "쿠션",       emoji: "🛋️", target: "bed",     stack: "A", layer: 1, x: 36,   y: 50,   rot: -6 },
+        { id: "socks",    name: "구겨진 양말", emoji: "🧦", target: "laundry", stack: "A", layer: 2, x: 37.2, y: 47.5, rot: 9 },
+        { id: "hoodie",   name: "벗어둔 후드", emoji: "👕", target: "laundry", stack: "A", layer: 3, x: 35.5, y: 44.8, rot: -8 },
+
+        // Stack B (정중앙: 책상/음료 더미)
+        { id: "remote",   name: "리모컨",     emoji: "📺", target: "desk",    stack: "B", layer: 1, x: 50,   y: 44,   rot: 5 },
+        { id: "notebook", name: "펼쳐진 노트", emoji: "📓", target: "desk",    stack: "B", layer: 2, x: 49,   y: 41.2, rot: -7 },
+        { id: "cup",      name: "빈 커피컵",  emoji: "🥤", target: "trash",   stack: "B", layer: 3, x: 51,   y: 38.4, rot: 6 },
+
+        // Stack C (오른쪽 중앙: 바닥/현관 더미)
+        { id: "slippers", name: "슬리퍼",     emoji: "🩴", target: "door",    stack: "C", layer: 1, x: 64,   y: 52,   rot: -5 },
+        { id: "blanket",  name: "뭉친 담요",  emoji: "🧶", target: "bed",     stack: "C", layer: 2, x: 62.8, y: 49.2, rot: 8 },
+        { id: "wrapper",  name: "과자 봉지",  emoji: "🍬", target: "trash",   stack: "C", layer: 3, x: 64.5, y: 46.2, rot: -10 }
+      ];
+
+      const stage = document.getElementById("stage");
+      const itemsLayer = document.getElementById("itemsLayer");
+      const progressText = document.getElementById("progressText");
+      const meterFill = document.getElementById("meterFill");
+      const keyPill = document.getElementById("keyPill");
+      const guideBar = document.getElementById("guideBar");
+      const hiddenKeyEl = document.getElementById("hiddenKey");
+      const keyTagEl = document.getElementById("keyTag");
+      const zoneDoorEl = document.getElementById("zoneDoor");
+      const doorStatusEl = document.getElementById("doorStatus");
+      const clearModal = document.getElementById("clearModal");
+      const standaloneToast = document.getElementById("standaloneToast");
+      const dropZones = [...document.querySelectorAll(".drop-zone")];
+
+      let itemsState = [];
+      let sortedCount = 0;
+      let keyRevealed = false;
+      let clearSent = false;
+      let activeDrag = null;
+      let toastTimer = null;
+
+      // ZEP 부모(main.js) 메시지 전송 + 일반 브라우저 테스트 안전 처리
+      function sendToZep(payload) {
+        const isEmbedded = window.parent && window.parent !== window;
+        try {
+          if (isEmbedded) {
+            window.parent.postMessage(payload, "*");
+          } else {
+            window.postMessage(payload, "*");
+            console.info("[ZEP Widget 테스트 전송]", payload);
+            showStandaloneToast(`브라우저 테스트: ${JSON.stringify(payload)} 전송됨`);
+          }
+        } catch (err) {
+          console.warn("메시지 전송 중 오류:", err);
+        }
+      }
+
+      function showStandaloneToast(text) {
+        standaloneToast.textContent = text;
+        standaloneToast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => standaloneToast.classList.remove("show"), 2000);
+      }
+
+      function setGuide(text, tone = "") {
+        guideBar.textContent = text;
+        guideBar.className = "guide-bar" + (tone ? ` ${tone}` : "");
+      }
+
+      // 특정 스택에서 현재 맨 위에 있는(미정리) 아이템 레이어 번호 반환
+      function getTopLayerOfStack(stackId) {
+        const remaining = itemsState.filter(it => it.stack === stackId && !it.sorted);
+        if (remaining.length === 0) return 0;
+        return Math.max(...remaining.map(it => it.layer));
+      }
+
+      // 스택별 잠금/활성 상태 갱신
+      function refreshStackStates(uncoveredStackId = null) {
+        const topByStack = {
+          A: getTopLayerOfStack("A"),
+          B: getTopLayerOfStack("B"),
+          C: getTopLayerOfStack("C")
+        };
+
+        itemsState.forEach(item => {
+          if (item.sorted || !item.el) return;
+          const topLayer = topByStack[item.stack];
+          const isTop = item.layer === topLayer;
+          const wasCovered = item.el.classList.contains("covered");
+
+          item.el.classList.toggle("covered", !isTop);
+          item.el.style.zIndex = String(10 + item.layer * 5);
+
+          // 스택 맨 위 표시 뱃지 (아래에 물건이 더 남아있을 때만 표시)
+          const existingBadge = item.el.querySelector(".stack-badge");
+          const belowCount = itemsState.filter(
+            other => other.stack === item.stack && !other.sorted && other.layer < item.layer
+          ).length;
+
+          if (isTop && (belowCount > 0 || (item.stack === "A" && !keyRevealed))) {
+            if (!existingBadge) {
+              const badge = document.createElement("span");
+              badge.className = "stack-badge";
+              badge.textContent = item.stack === "A" && belowCount === 0 ? "아래 ✨" : `아래 +${belowCount}`;
+              item.el.appendChild(badge);
+            } else {
+              existingBadge.textContent = item.stack === "A" && belowCount === 0 ? "아래 ✨" : `아래 +${belowCount}`;
+            }
+          } else if (existingBadge) {
+            existingBadge.remove();
+          }
+
+          if (isTop && wasCovered && item.stack === uncoveredStackId) {
+            item.el.classList.remove("uncover-pop");
+            void item.el.offsetWidth;
+            item.el.classList.add("uncover-pop");
+          }
+        });
+
+        // Stack A가 모두 비워지면 숨겨진 열쇠 드러내기
+        if (topByStack.A === 0 && !keyRevealed) {
+          keyRevealed = true;
+          hiddenKeyEl.classList.add("revealed");
+          hiddenKeyEl.setAttribute("tabindex", "0");
+          keyPill.classList.add("found");
+          keyPill.textContent = "🔑 열쇠 발견!";
+
+          const left = ITEM_DEFS.length - sortedCount;
+          if (left > 0) {
+            keyTagEl.textContent = `남은 ${left}개 정리!`;
+            setGuide(`✨ 쿠션 아래에 현관 열쇠(🔑)가 있었어요! 남은 물건 ${left}개를 마저 정리하면 챙길 수 있어요.`, "good");
+          }
+        } else if (keyRevealed && !clearSent) {
+          const left = ITEM_DEFS.length - sortedCount;
+          if (left > 0) {
+            keyTagEl.textContent = `남은 ${left}개 정리!`;
+          }
+        }
+      }
+
+      function updateProgressUI() {
+        const total = ITEM_DEFS.length;
+        progressText.textContent = `${sortedCount} / ${total}`;
+        meterFill.style.width = `${Math.round((sortedCount / total) * 100)}%`;
+      }
+
+      function spawnFloatText(x, y, text) {
+        const el = document.createElement("div");
+        el.className = "float-text";
+        el.textContent = text;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        stage.appendChild(el);
+        setTimeout(() => el.remove(), 760);
+      }
+
+      // 클리어 및 열쇠 획득 처리
+      function triggerKeyAcquire() {
+        if (clearSent) return;
+        clearSent = true;
+
+        keyTagEl.textContent = "획득!";
+        hiddenKeyEl.classList.add("acquired");
+        keyPill.classList.remove("found");
+        keyPill.classList.add("acquired");
+        keyPill.textContent = "✨ 열쇠 획득!";
+
+        zoneDoorEl.classList.add("unlocked");
+        doorStatusEl.textContent = "🔓 현관 열쇠 획득 완료!";
+        setGuide("🎉 방 정돈 완료! 현관 열쇠(🔑)를 얻었습니다!", "good");
+
+        // ZEP main.js 규격에 맞춰 클리어 메시지 전송
+        sendToZep({ type: "TIDY_CLEAR" });
+
+        setTimeout(() => {
+          clearModal.classList.add("open");
+        }, 480);
+      }
+
+      // 좌표로 드롭 구역 탐색 (모바일 배려 10px 여유 마진)
+      function findHoveredZone(clientX, clientY) {
+        const margin = 10;
+        for (const zone of dropZones) {
+          const r = zone.getBoundingClientRect();
+          if (
+            clientX >= r.left - margin &&
+            clientX <= r.right + margin &&
+            clientY >= r.top - margin &&
+            clientY <= r.bottom + margin
+          ) {
+            return zone;
+          }
+        }
+        return null;
+      }
+
+      function clearZoneHighlights() {
+        dropZones.forEach(z => z.classList.remove("drag-over"));
+      }
+
+      // 드래그 시작 (마우스 + 터치 통합)
+      function onPointerDown(e, item) {
+        if (item.sorted || clearSent) return;
+        e.preventDefault();
+
+        // 아래에 깔린 아이템을 잡으려 했을 때 안내
+        if (item.el.classList.contains("covered")) {
+          const topLayer = getTopLayerOfStack(item.stack);
+          const topItem = itemsState.find(it => it.stack === item.stack && !it.sorted && it.layer === topLayer);
+          item.el.classList.remove("locked-shake");
+          void item.el.offsetWidth;
+          item.el.classList.add("locked-shake");
+          if (topItem) {
+            setGuide(`⚠️ 위에 쌓인 [${topItem.name}]부터 먼저 치워야 꺼낼 수 있어요!`, "warn");
+          }
+          return;
+        }
+
+        const stageRect = stage.getBoundingClientRect();
+        const itemRect = item.el.getBoundingClientRect();
+        const centerX = itemRect.left + itemRect.width / 2;
+        const centerY = itemRect.top + itemRect.height / 2;
+
+        activeDrag = {
+          item,
+          pointerId: e.pointerId,
+          offsetX: e.clientX - centerX,
+          offsetY: e.clientY - centerY,
+          stageRect
+        };
+
+        item.el.classList.remove("returning");
+        item.el.classList.add("dragging");
+
+        // 픽셀 좌표로 즉시 전환하여 부드럽게 이동
+        item.el.style.left = `${centerX - stageRect.left}px`;
+        item.el.style.top = `${centerY - stageRect.top}px`;
+
+        setGuide(`👉 [${item.name}]을(를) 알맞은 구역에 놓아주세요.`);
+      }
+
+      function onPointerMove(e) {
+        if (!activeDrag || e.pointerId !== activeDrag.pointerId) return;
+        e.preventDefault();
+
+        const { item, offsetX, offsetY, stageRect } = activeDrag;
+        const nextX = e.clientX - offsetX - stageRect.left;
+        const nextY = e.clientY - offsetY - stageRect.top;
+
+        // 스테이지 경계 안쪽으로 클램핑
+        const clampedX = Math.max(24, Math.min(stageRect.width - 24, nextX));
+        const clampedY = Math.max(24, Math.min(stageRect.height - 24, nextY));
+
+        item.el.style.left = `${clampedX}px`;
+        item.el.style.top = `${clampedY}px`;
+
+        clearZoneHighlights();
+        const hovered = findHoveredZone(e.clientX, e.clientY);
+        if (hovered) {
+          hovered.classList.add("drag-over");
+        }
+      }
+
+      function onPointerUp(e) {
+        if (!activeDrag || e.pointerId !== activeDrag.pointerId) return;
+
+        const { item, stageRect } = activeDrag;
+        const hovered = findHoveredZone(e.clientX, e.clientY);
+
+        clearZoneHighlights();
+        item.el.classList.remove("dragging");
+        activeDrag = null;
+
+        if (hovered && hovered.dataset.zone === item.target) {
+          // 정답 구역 배치 성공
+          item.sorted = true;
+          sortedCount++;
+
+          const zoneRect = hovered.getBoundingClientRect();
+          const fx = zoneRect.left + zoneRect.width / 2 - stageRect.left;
+          const fy = zoneRect.top + zoneRect.height / 2 - stageRect.top;
+
+          item.el.remove();
+          item.el = null;
+
+          // 구역 내부에 정리된 아이콘 추가
+          const tray = document.getElementById(`collected-${item.target}`);
+          if (tray) {
+            const chip = document.createElement("span");
+            chip.className = "mini-chip";
+            chip.textContent = item.emoji;
+            chip.title = item.name;
+            tray.appendChild(chip);
+          }
+
+          spawnFloatText(fx, fy, `${item.emoji} 정리 완료!`);
+          updateProgressUI();
+
+          const remaining = ITEM_DEFS.length - sortedCount;
+          if (remaining > 0) {
+            setGuide(`👍 [${item.name}] 정리 완료! (${ZONE_LABELS[item.target]}) · 남은 물건 ${remaining}개`, "good");
+          }
+
+          refreshStackStates(item.stack);
+
+          if (sortedCount === ITEM_DEFS.length) {
+            triggerKeyAcquire();
+          }
+        } else {
+          // 오답 구역이거나 빈 공간 -> 원래 위치(%)로 부드럽게 복귀
+          item.el.classList.add("returning");
+          item.el.style.left = `${item.x}%`;
+          item.el.style.top = `${item.y}%`;
+
+          if (hovered && hovered.dataset.zone !== item.target) {
+            hovered.classList.remove("wrong-flash");
+            void hovered.offsetWidth;
+            hovered.classList.add("wrong-flash");
+            setGuide(`🤔 [${item.name}]은(는) ${ZONE_LABELS[item.target]} 쪽에 정리해 볼까요?`, "warn");
+          } else {
+            setGuide("알맞은 정리 구역 위로 물건을 드래그해 놓아주세요.");
+          }
+        }
+      }
+
+      // 드러난 열쇠를 미리 클릭했을 때 안내
+      hiddenKeyEl.addEventListener("click", () => {
+        if (!keyRevealed || clearSent) return;
+        const left = ITEM_DEFS.length - sortedCount;
+        if (left > 0) {
+          setGuide(`🔑 열쇠를 찾았어요! 방에 남은 물건 ${left}개를 마저 정리하면 바로 챙길 수 있어요.`, "good");
+        } else {
+          triggerKeyAcquire();
+        }
+      });
+
+      // 위젯 닫기 요청 (ZEP main.js 규격: { type: "CLOSE" })
+      function requestCloseWidget() {
+        sendToZep({ type: "CLOSE" });
+        // 일반 브라우저 테스트 환경일 경우 모달만 닫아 확인 가능하게 처리
+        if (!window.parent || window.parent === window) {
+          clearModal.classList.remove("open");
+        }
+      }
+
+      // 게임 초기화
+      function initGame() {
+        activeDrag = null;
+        sortedCount = 0;
+        keyRevealed = false;
+        clearSent = false;
+
+        itemsLayer.innerHTML = "";
+        Object.keys(ZONE_LABELS).forEach(z => {
+          const tray = document.getElementById(`collected-${z}`);
+          if (tray) tray.innerHTML = "";
+        });
+
+        hiddenKeyEl.className = "hidden-key";
+        hiddenKeyEl.setAttribute("tabindex", "-1");
+        keyTagEl.textContent = "열쇠 발견!";
+        keyPill.className = "pill key-pill";
+        keyPill.textContent = "🔒 열쇠 찾는 중";
+
+        zoneDoorEl.classList.remove("unlocked");
+        doorStatusEl.textContent = "🔒 열쇠가 필요해요";
+        clearModal.classList.remove("open");
+
+        itemsState = ITEM_DEFS.map(def => {
+          const el = document.createElement("div");
+          el.className = "drag-item";
+          el.style.left = `${def.x}%`;
+          el.style.top = `${def.y}%`;
+          el.style.setProperty("--rot", `${def.rot}deg`);
+          el.innerHTML = `<span class="emoji">${def.emoji}</span><span class="item-label">${def.name}</span>`;
+
+          const stateObj = { ...def, sorted: false, el };
+          el.addEventListener("pointerdown", e => onPointerDown(e, stateObj));
+          itemsLayer.appendChild(el);
+          return stateObj;
+        });
+
+        updateProgressUI();
+        refreshStackStates();
+        setGuide("☀️ 아침이 밝았어요! 쌓여 있는 물건을 위에서부터 알맞은 구역으로 드래그해 정리하고 현관 열쇠(🔑)를 찾아보세요.");
+      }
+
+      window.addEventListener("pointermove", onPointerMove, { passive: false });
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
+
+      document.getElementById("btnReset").addEventListener("click", initGame);
+      document.getElementById("btnReplay").addEventListener("click", initGame);
+      document.getElementById("btnCloseTop").addEventListener("click", requestCloseWidget);
+      document.getElementById("btnCloseModal").addEventListener("click", requestCloseWidget);
+
+      initGame();
+    })();
+  </script>
+</body>
+</html>
