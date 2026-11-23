@@ -1,0 +1,1344 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>미래소프트 · 게임 출시 대작전</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Jua&family=Press+Start+2P&display=swap");
+
+    :root {
+      --ink: #1e2d3d;
+      --paper: #eef2f7;
+      --cream: #fffaf0;
+      --panel: #ffffff;
+      --accent: #6c63ff;
+      --accent-dark: #4b43c8;
+      --orange: #ff9452;
+      --mint: #6cd6a8;
+      --mint-dark: #257353;
+      --gold: #ffcf56;
+      --danger: #eb5e55;
+      --screen-bg: #1b2436;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+      gap: 6px;
+      background-image: radial-gradient(#cfd8e6 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+
+    /* 상단 HUD */
+    .hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 10px;
+      background: var(--cream);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: 0 3px 0 #bec8d8;
+      flex-shrink: 0;
+    }
+
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .brand {
+      font-size: clamp(14px, 2.2vw, 21px);
+      white-space: nowrap;
+    }
+    .brand span { color: var(--accent); }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      background: var(--panel);
+      border: 2px solid var(--ink);
+      border-radius: 7px;
+      font-size: clamp(11px, 1.4vw, 14px);
+      white-space: nowrap;
+    }
+    .pill em {
+      font-style: normal;
+      color: var(--accent-dark);
+    }
+    .pill.alert {
+      background: #ffe3e1;
+      border-color: var(--danger);
+      color: #a62b24;
+    }
+    .pill.ready {
+      background: #d5f6e6;
+      border-color: var(--mint-dark);
+      color: #1c5c41;
+    }
+
+    .hud-right {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .btn-top {
+      border: 2.5px solid var(--ink);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      padding: 5px 10px;
+      min-height: 34px;
+      font-family: inherit;
+      font-size: clamp(12px, 1.5vw, 14px);
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--ink);
+      transition: transform 0.08s, box-shadow 0.08s, background 0.12s;
+      white-space: nowrap;
+    }
+    .btn-top:hover { background: #eae8ff; }
+    .btn-top:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+    .btn-top.close { background: #f8d8d4; }
+    .btn-top.close:hover { background: #ffbdb5; }
+
+    /* 3단계 진행 스텝 */
+    .phase-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .phase-step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border: 2.5px solid #8a96a8;
+      border-radius: 8px;
+      background: #e4e9f2;
+      color: #647185;
+      font-size: clamp(11px, 1.4vw, 14px);
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .phase-step.active {
+      border-color: var(--ink);
+      background: #ffe49c;
+      color: var(--ink);
+      box-shadow: 0 2.5px 0 var(--ink);
+    }
+    .phase-step.done {
+      border-color: var(--mint-dark);
+      background: #cbf2df;
+      color: #1d5d42;
+    }
+
+    /* 안내 배너 */
+    .guide-bar {
+      text-align: center;
+      padding: 5px 10px;
+      background: var(--cream);
+      border: 2.5px solid var(--ink);
+      border-radius: 8px;
+      font-size: clamp(11.5px, 1.5vw, 14px);
+      line-height: 1.3;
+      color: #34465a;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .guide-bar.warn { background: #ffe4e1; color: #a62b24; }
+    .guide-bar.good { background: #dcf8ea; color: #1f5e43; }
+
+    /* 메인 작업 영역 */
+    .workspace {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1.35fr 0.95fr;
+      gap: 8px;
+    }
+
+    .panel {
+      background: var(--cream);
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 0 #bec8d8;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: clamp(14px, 1.8vw, 18px);
+      padding-bottom: 5px;
+      border-bottom: 2px dashed #c8d2e0;
+      flex-shrink: 0;
+    }
+    .panel-title small {
+      font-size: 12px;
+      color: #66758a;
+    }
+
+    /* 좌측: 게임 엔진 빌드 모니터 */
+    .engine-monitor {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .preview-screen {
+      position: relative;
+      flex: 0.95;
+      min-height: 118px;
+      border: 3.5px solid var(--ink);
+      border-radius: 10px;
+      background: var(--screen-bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #d9e4f5;
+      box-shadow: inset 0 0 0 3px #2b3852;
+    }
+
+    /* 픽셀 게임 프리뷰 레이어들 */
+    .pv-layer {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+    .pv-layer.on { opacity: 1; }
+
+    /* 1. 그래픽 레이어: 도트 하늘/잔디/구름 */
+    .pv-art {
+      background: linear-gradient(180deg, #5da9e9 0 64%, #5cb874 64% 100%);
+    }
+    .pv-art::before {
+      content: "☁️      ☁️";
+      position: absolute;
+      top: 10%;
+      left: 14%;
+      font-size: 20px;
+      opacity: 0.9;
+    }
+    .pv-art::after {
+      content: "🌳   🏫   🌳";
+      position: absolute;
+      bottom: 32%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(22px, 3.5vw, 32px);
+      white-space: nowrap;
+    }
+
+    /* 2. 기획/UI 레이어: 상단 퀘스트 HUD */
+    .pv-plan::before {
+      content: "QUEST: 청년센터 탐색  [★ 100%]";
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      padding: 3px 8px;
+      background: rgba(255, 250, 240, 0.92);
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      font-size: clamp(10px, 1.3vw, 12px);
+    }
+
+    /* 3. 개발/스크립트 레이어: 움직이는 아바타 */
+    .pv-dev::before {
+      content: "🧑‍💻";
+      position: absolute;
+      bottom: 14%;
+      left: 25%;
+      font-size: clamp(26px, 4vw, 34px);
+      animation: avatarWalk 2.2s ease-in-out infinite alternate;
+    }
+
+    /* 4. 사운드 레이어: 음표 파동 */
+    .pv-sound::after {
+      content: "🎵 BGM ON";
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      padding: 3px 8px;
+      background: #ffe08a;
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      font-size: clamp(10px, 1.3vw, 12px);
+    }
+
+    .pv-empty-msg {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 8px 14px;
+      background: rgba(27, 36, 54, 0.78);
+      border: 2px dashed #5d7299;
+      border-radius: 8px;
+      font-size: clamp(12px, 1.5vw, 14px);
+      color: #c7d6ee;
+    }
+    .pv-empty-msg.hidden { display: none; }
+
+    /* QA 버그 오버레이 (2단계) */
+    .bug-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: none;
+      align-items: center;
+      justify-content: space-evenly;
+      gap: 8px;
+      padding: 10px;
+      background: rgba(24, 18, 32, 0.72);
+    }
+    .bug-layer.active { display: flex; }
+
+    .bug-target {
+      flex: 1;
+      max-width: 148px;
+      padding: 8px 6px;
+      background: #fff3f2;
+      border: 3px solid var(--danger);
+      border-radius: 10px;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(166, 43, 36, 0.45);
+      transition: transform 0.14s, background 0.14s, border-color 0.14s;
+      animation: bugWiggle 1.6s ease-in-out infinite;
+    }
+    .bug-target.drag-over {
+      transform: scale(1.07);
+      background: #dcf8ea;
+      border-color: var(--mint-dark);
+      box-shadow: 0 0 0 4px rgba(108, 214, 168, 0.6);
+      animation: none;
+    }
+    .bug-target.tap-ready {
+      border-style: dashed;
+      background: #fff9e6;
+    }
+    .bug-target.fixed {
+      background: #d5f6e6;
+      border-color: var(--mint-dark);
+      box-shadow: none;
+      animation: none;
+      cursor: default;
+      opacity: 0.92;
+    }
+    .bug-target.wrong-flash {
+      animation: shake 0.3s ease;
+      background: #ffd1cd;
+    }
+
+    .bug-emoji { font-size: clamp(22px, 3.4vw, 30px); line-height: 1; }
+    .bug-name { font-size: clamp(11px, 1.3vw, 13px); line-height: 1.2; }
+    .bug-hint {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 99px;
+      background: #ffe1de;
+      color: #a62b24;
+    }
+    .bug-target.fixed .bug-hint {
+      background: #b9ebd3;
+      color: #1b5c40;
+    }
+
+    /* 출시 버튼 오버레이 (3단계) */
+    .launch-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(20, 34, 48, 0.52);
+      backdrop-filter: blur(1px);
+    }
+    .launch-layer.active { display: flex; }
+
+    .btn-launch {
+      border: 4px solid var(--ink);
+      border-radius: 14px;
+      padding: 13px 28px;
+      background: linear-gradient(180deg, #ffaf5f, #ff7b47);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: clamp(18px, 2.5vw, 23px);
+      cursor: pointer;
+      box-shadow: 0 6px 0 var(--ink), 0 0 22px rgba(255, 175, 95, 0.75);
+      animation: pulseBtn 1.2s ease-in-out infinite;
+    }
+    .btn-launch:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 var(--ink);
+    }
+
+    /* 4개 빌드 모듈 슬롯 */
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+      flex: 0.85;
+      min-height: 0;
+    }
+
+    .build-slot {
+      border: 3px dashed #8f9db3;
+      border-radius: 10px;
+      background: var(--panel);
+      padding: 7px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.14s, background 0.14s, border-color 0.14s;
+    }
+    .build-slot.drag-over {
+      transform: scale(1.03);
+      background: #e4f9ef;
+      border-style: solid;
+      border-color: var(--mint-dark);
+      box-shadow: 0 0 0 3px rgba(108, 214, 168, 0.5);
+    }
+    .build-slot.tap-ready {
+      border-color: var(--accent);
+      background: #f2f1ff;
+    }
+    .build-slot.filled {
+      border-style: solid;
+      border-color: var(--ink);
+      background: #ddf6ea;
+      cursor: default;
+      animation: popIn 0.28s ease;
+    }
+    .build-slot.wrong-flash {
+      border-color: var(--danger);
+      background: #ffe1de;
+      animation: shake 0.3s ease;
+    }
+
+    .slot-team { font-size: clamp(11.5px, 1.4vw, 14px); color: var(--ink); }
+    .slot-sub { font-size: clamp(10px, 1.2vw, 12px); color: #67768b; }
+    .build-slot.filled .slot-sub { color: #1e6245; }
+
+    /* 우측: 팀 산출물 / 패치 도구 트레이 */
+    .tray-list {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      overflow-y: auto;
+      padding: 2px;
+    }
+
+    .drag-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      min-height: 52px;
+      background: var(--panel);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: 0 4px 0 var(--ink);
+      cursor: grab;
+      touch-action: none;
+      transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s, background 0.12s;
+    }
+    .drag-card:hover { transform: translateY(-2px); background: #fff9eb; }
+    .drag-card:active { cursor: grabbing; }
+    .drag-card.selected {
+      border-color: var(--accent);
+      background: #eeecff;
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.4), 0 4px 0 var(--ink);
+    }
+    .drag-card.used {
+      opacity: 0.4;
+      pointer-events: none;
+      box-shadow: none;
+      background: #eaeef5;
+    }
+
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 2px solid var(--ink);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+    .card-name { font-size: clamp(12.5px, 1.5vw, 15px); }
+    .card-desc { font-size: clamp(10.5px, 1.2vw, 12px); color: #647387; }
+
+    .log-box {
+      padding: 7px 9px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #1e2a3b;
+      color: #8bf2c3;
+      font-family: monospace;
+      font-size: 11.5px;
+      line-height: 1.4;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .drag-ghost {
+      position: fixed;
+      z-index: 500;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(1.06);
+      box-shadow: 0 12px 24px rgba(30, 45, 61, 0.35);
+    }
+
+    /* 클리어 모달 */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 600;
+      display: none;
+      place-items: center;
+      padding: 14px;
+      background: rgba(18, 28, 42, 0.66);
+      backdrop-filter: blur(2px);
+    }
+    .modal-backdrop.open { display: grid; }
+
+    .modal-card {
+      width: min(430px, 94%);
+      padding: 22px 18px 18px;
+      background: var(--cream);
+      border: 4px solid var(--ink);
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 8px 0 rgba(18, 28, 42, 0.45);
+      background-image: radial-gradient(#d7dfeb 1px, transparent 1px);
+      background-size: 14px 14px;
+      animation: popIn 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+    }
+    .modal-art { font-size: clamp(42px, 8vw, 56px); line-height: 1.1; margin-bottom: 6px; }
+    .modal-card h2 { margin: 4px 0 8px; font-size: clamp(21px, 4.5vw, 28px); text-shadow: 2px 2px #d8d5ff; }
+    .modal-card p { margin: 0 0 14px; color: #4a5b6e; line-height: 1.55; font-size: clamp(13px, 2.5vw, 15px); }
+
+    .badge-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .team-badge {
+      padding: 4px 9px;
+      border: 2px solid var(--ink);
+      border-radius: 99px;
+      background: #e3f8ee;
+      font-size: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary, .btn-secondary {
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      padding: 10px 22px;
+      min-height: 44px;
+      font-family: inherit;
+      font-size: 17px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--ink);
+    }
+    .btn-primary { background: var(--orange); color: var(--ink); }
+    .btn-secondary { background: #e3e8f0; color: var(--ink); font-size: 14.5px; padding: 10px 14px; }
+    .btn-primary:active, .btn-secondary:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+
+    .standalone-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 700;
+      background: #1e2d3d;
+      color: #fffaf0;
+      padding: 7px 14px;
+      border-radius: 99px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .standalone-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== 반응형 1: 모바일 세로 / 좁은 위젯 (<= 720px) ===== */
+    @media (max-width: 720px) {
+      .hud { padding: 5px 8px; }
+      .pill.hide-sm { display: none; }
+      .phase-step { font-size: 10.5px; padding: 4px 4px; }
+      .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1.15fr 0.85fr;
+        gap: 6px;
+      }
+      .panel { padding: 8px; gap: 6px; }
+      .panel-title small { display: none; }
+      .preview-screen { min-height: 104px; flex: 1; }
+      .slot-grid { flex: 0.78; gap: 5px; }
+      .build-slot { padding: 4px 5px; }
+      .tray-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        align-content: start;
+      }
+      .drag-card { padding: 7px 8px; min-height: 48px; gap: 7px; }
+      .card-icon { width: 30px; height: 30px; font-size: 17px; }
+      .card-desc { display: none; }
+      .log-box { display: none; }
+    }
+
+    /* ===== 반응형 2: 낮은 가로 화면 (height <= 500px) ===== */
+    @media (max-height: 500px) {
+      .app { padding: 4px; gap: 4px; }
+      .hud { padding: 4px 8px; }
+      .guide-bar { padding: 3px 8px; font-size: 11px; }
+      .phase-bar { display: none; }
+      .panel { padding: 7px; gap: 5px; }
+      .preview-screen { min-height: 82px; }
+      .drag-card { min-height: 40px; padding: 5px 8px; }
+      .card-desc, .log-box { display: none; }
+    }
+
+    @keyframes avatarWalk { from { left: 18%; } to { left: 72%; } }
+    @keyframes bugWiggle { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg) translateY(-2px); } }
+    @keyframes pulseBtn { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes popIn { 0% { transform: scale(0.75); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- 상단 HUD -->
+    <header class="hud">
+      <div class="hud-left">
+        <div class="brand">🚀 미래소프트 <span>· 게임 출시 대작전</span></div>
+        <div class="pill">🧩 빌드 <em id="buildPct">0%</em></div>
+        <div class="pill hide-sm" id="qaPill">🛡️ QA 대기</div>
+      </div>
+      <div class="hud-right">
+        <button type="button" class="btn-top" id="btnReset">↻ 다시</button>
+        <button type="button" class="btn-top close" id="btnCloseTop">✕ 닫기</button>
+      </div>
+    </header>
+
+    <!-- 3단계 진행바 -->
+    <nav class="phase-bar">
+      <div class="phase-step active" id="pStep1">1. 팀 빌드 조립</div>
+      <div class="phase-step" id="pStep2">2. QA 버그 패치</div>
+      <div class="phase-step" id="pStep3">3. 게임 정식 출시</div>
+    </nav>
+
+    <!-- 안내 배너 -->
+    <div class="guide-bar" id="guideBar">
+      🧩 4개 팀의 작업물을 알맞은 엔진 슬롯으로 드래그(또는 터치)해 게임을 조립하세요!
+    </div>
+
+    <!-- 메인 워크스페이스 -->
+    <main class="workspace">
+      <!-- 좌측: 엔진 프리뷰 & 빌드 슬롯 -->
+      <section class="panel">
+        <div class="panel-title">
+          <span id="leftTitle">🖥️ 미래소프트 게임 엔진 v2.0</span>
+          <small id="leftSub">드래그 또는 터치로 조립</small>
+        </div>
+
+        <div class="engine-monitor">
+          <!-- 실시간 빌드 프리뷰 모니터 -->
+          <div class="preview-screen" id="previewScreen">
+            <div class="pv-layer pv-art" id="pvArt"></div>
+            <div class="pv-layer pv-plan" id="pvPlan"></div>
+            <div class="pv-layer pv-dev" id="pvDev"></div>
+            <div class="pv-layer pv-sound" id="pvSound"></div>
+
+            <div class="pv-empty-msg" id="pvEmptyMsg">
+              빌드 대기 중...<br />아래 슬롯에 팀 작업물을 넣어주세요
+            </div>
+
+            <!-- 2단계: QA 버그 3종 오버레이 -->
+            <div class="bug-layer" id="bugLayer"></div>
+
+            <!-- 3단계: 정식 출시 버튼 오버레이 -->
+            <div class="launch-layer" id="launchLayer">
+              <div style="font-size:13px;color:#fff;background:rgba(30,45,61,0.85);padding:4px 12px;border-radius:99px;">
+                ✨ 모든 테스트 통과! 출시 준비 완료
+              </div>
+              <button type="button" class="btn-launch" id="btnLaunch">🚀 게임 정식 출시!</button>
+            </div>
+          </div>
+
+          <!-- 4개 팀 빌드 슬롯 -->
+          <div class="slot-grid" id="slotGrid"></div>
+        </div>
+      </section>
+
+      <!-- 우측: 팀 산출물 / 패치 도구 트레이 -->
+      <section class="panel">
+        <div class="panel-title">
+          <span id="trayTitle">📦 4개 팀 산출물</span>
+          <small id="traySub">4개 남음</small>
+        </div>
+        <div class="tray-list" id="trayList"></div>
+        <div class="log-box" id="logBox">&gt; [SYSTEM] MiraeSoft Studio 프로젝트 초기화 완료...</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 출시 성공 모달 -->
+  <div class="modal-backdrop" id="clearModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-art">🚀🎮✨</div>
+      <h2 id="modalTitle">미래소프트 신작 출시 성공!</h2>
+      <p>
+        기획·그래픽·개발·사운드 4개 팀의 협업을 완성하고<br />
+        출시 직전 버그까지 완벽하게 패치했어요!<br />
+        <strong>청년 메타버스 스튜디오 빌드 v1.0</strong>이 정식 오픈되었습니다.
+      </p>
+      <div class="badge-row">
+        <span class="team-badge">📝 기획 완료</span>
+        <span class="team-badge">🎨 도트 완료</span>
+        <span class="team-badge">💻 스크립트 완료</span>
+        <span class="team-badge">🎵 사운드 완료</span>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-primary" id="btnCloseModal">닫기</button>
+        <button type="button" class="btn-secondary" id="btnReplay">다시 개발하기 ↻</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="standalone-toast" id="standaloneToast"></div>
+
+  <script>
+    (() => {
+      // 1단계: 미래소프트 4개 팀 빌드 모듈
+      const BUILD_MODULES = [
+        {
+          id: "plan",
+          team: "기획 & UI/UX",
+          slotName: "시나리오 · UI 슬롯",
+          cardName: "퀘스트 기획서",
+          desc: "스토리보드 & 대화 팝업",
+          emoji: "📝",
+          color: "#ffe4b5",
+          previewId: "pvPlan"
+        },
+        {
+          id: "art",
+          team: "그래픽 디자인",
+          slotName: "도트 에셋 슬롯",
+          cardName: "2D 도트 타일셋",
+          desc: "배경 맵 & 픽셀 아바타",
+          emoji: "🎨",
+          color: "#ffd6e0",
+          previewId: "pvArt"
+        },
+        {
+          id: "dev",
+          team: "개발 & 스크립트",
+          slotName: "스크립트 엔진 슬롯",
+          cardName: "ZEP 상호작용 코드",
+          desc: "오브젝트 & 퀘스트 로직",
+          emoji: "💻",
+          color: "#d4ecff",
+          previewId: "pvDev"
+        },
+        {
+          id: "sound",
+          team: "사운드 & BGM",
+          slotName: "오디오 믹싱 슬롯",
+          cardName: "맵 BGM & 효과음",
+          desc: "배경음악 & 버튼 사운드",
+          emoji: "🎵",
+          color: "#d9f5d8",
+          previewId: "pvSound"
+        }
+      ];
+
+      // 2단계: 출시 직전 QA 버그 3종 & 패치 도구
+      const QA_BUGS = [
+        {
+          id: "bug_art",
+          emoji: "👾",
+          name: "도트 깨짐",
+          hint: "그래픽 패치 필요",
+          toolName: "🎨 도트 리소스 픽스",
+          toolDesc: "깨진 스프라이트 복구",
+          toolColor: "#ffd6e0"
+        },
+        {
+          id: "bug_dev",
+          emoji: "⚡",
+          name: "스크립트 충돌",
+          hint: "코드 핫픽스 필요",
+          toolName: "💻 스크립트 핫픽스",
+          toolDesc: "이벤트 예외 처리 패치",
+          toolColor: "#d4ecff"
+        },
+        {
+          id: "bug_sound",
+          emoji: "🔇",
+          name: "BGM 무음",
+          hint: "오디오 싱크 필요",
+          toolName: "🎵 오디오 싱크 패치",
+          toolDesc: "사운드 채널 및 볼륨 복구",
+          toolColor: "#d9f5d8"
+        }
+      ];
+
+      const buildPctEl = document.getElementById("buildPct");
+      const qaPillEl = document.getElementById("qaPill");
+      const guideBar = document.getElementById("guideBar");
+      const pStep1 = document.getElementById("pStep1");
+      const pStep2 = document.getElementById("pStep2");
+      const pStep3 = document.getElementById("pStep3");
+      const leftTitleEl = document.getElementById("leftTitle");
+      const leftSubEl = document.getElementById("leftSub");
+      const trayTitleEl = document.getElementById("trayTitle");
+      const traySubEl = document.getElementById("traySub");
+      const slotGrid = document.getElementById("slotGrid");
+      const trayList = document.getElementById("trayList");
+      const bugLayer = document.getElementById("bugLayer");
+      const launchLayer = document.getElementById("launchLayer");
+      const pvEmptyMsg = document.getElementById("pvEmptyMsg");
+      const logBox = document.getElementById("logBox");
+      const clearModal = document.getElementById("clearModal");
+      const standaloneToast = document.getElementById("standaloneToast");
+
+      let phase = 1; // 1: 빌드 조립, 2: QA 버그 패치, 3: 출시 준비, 4: 완료
+      let assembled = new Set();
+      let fixedBugs = new Set();
+      let selectedCardId = null;
+      let clearSent = false;
+      let toastTimer = null;
+      let cleanupFns = [];
+
+      function sendToZep(payload) {
+        const isEmbedded = window.parent && window.parent !== window;
+        try {
+          if (isEmbedded) {
+            window.parent.postMessage(payload, "*");
+          } else {
+            window.postMessage(payload, "*");
+            standaloneToast.textContent = `브라우저 테스트: ${JSON.stringify(payload)} 전송됨`;
+            standaloneToast.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => standaloneToast.classList.remove("show"), 2000);
+          }
+        } catch (err) {
+          console.warn("메시지 전송 오류:", err);
+        }
+      }
+
+      function setGuide(text, tone = "") {
+        guideBar.textContent = text;
+        guideBar.className = "guide-bar" + (tone ? ` ${tone}` : "");
+      }
+
+      function setLog(text) {
+        logBox.textContent = `> ${text}`;
+      }
+
+      function runCleanups() {
+        cleanupFns.forEach(fn => fn());
+        cleanupFns = [];
+      }
+
+      function shuffle(arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      function updatePhaseUI() {
+        const pct = Math.round((assembled.size / BUILD_MODULES.length) * 100);
+        buildPctEl.textContent = `${pct}%`;
+
+        pStep1.className = "phase-step" + (phase === 1 ? " active" : " done");
+        pStep2.className = "phase-step" + (phase === 2 ? " active" : phase > 2 ? " done" : "");
+        pStep3.className = "phase-step" + (phase === 3 ? " active" : phase > 3 ? " done" : "");
+
+        if (phase === 1) {
+          qaPillEl.className = "pill hide-sm";
+          qaPillEl.textContent = "🛡️ QA 대기";
+        } else if (phase === 2) {
+          qaPillEl.className = "pill hide-sm alert";
+          qaPillEl.textContent = `🐛 버그 ${QA_BUGS.length - fixedBugs.size}건 남음`;
+        } else {
+          qaPillEl.className = "pill hide-sm ready";
+          qaPillEl.textContent = "✅ 안정도 100%";
+        }
+
+        pvEmptyMsg.classList.toggle("hidden", assembled.size > 0);
+        bugLayer.classList.toggle("active", phase === 2);
+        launchLayer.classList.toggle("active", phase === 3);
+      }
+
+      function clearSelection() {
+        selectedCardId = null;
+        document.querySelectorAll(".drag-card.selected").forEach(el => el.classList.remove("selected"));
+        document.querySelectorAll(".tap-ready").forEach(el => el.classList.remove("tap-ready"));
+      }
+
+      function bindDragOrTapCard(cardEl, cardId, getTargets, onDropToTarget) {
+        let drag = null;
+
+        cardEl.addEventListener("pointerdown", e => {
+          if (cardEl.classList.contains("used")) return;
+          e.preventDefault();
+
+          drag = {
+            pointerId: e.pointerId,
+            startX: e.clientX,
+            startY: e.clientY,
+            moved: false,
+            ghost: null
+          };
+        });
+
+        const onMove = e => {
+          if (!drag || e.pointerId !== drag.pointerId) return;
+          e.preventDefault();
+
+          if (!drag.moved && Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) > 7) {
+            drag.moved = true;
+            clearSelection();
+            const rect = cardEl.getBoundingClientRect();
+            const ghost = cardEl.cloneNode(true);
+            ghost.classList.add("drag-ghost");
+            ghost.style.width = `${rect.width}px`;
+            ghost.style.height = `${rect.height}px`;
+            document.body.appendChild(ghost);
+            drag.ghost = ghost;
+            cardEl.style.opacity = "0.35";
+          }
+
+          if (!drag.moved || !drag.ghost) return;
+
+          drag.ghost.style.left = `${e.clientX}px`;
+          drag.ghost.style.top = `${e.clientY}px`;
+
+          const targets = getTargets();
+          targets.forEach(t => {
+            const r = t.getBoundingClientRect();
+            const hit =
+              e.clientX >= r.left - 12 &&
+              e.clientX <= r.right + 12 &&
+              e.clientY >= r.top - 12 &&
+              e.clientY <= r.bottom + 12;
+            t.classList.toggle("drag-over", hit);
+          });
+        };
+
+        const onUp = e => {
+          if (!drag || e.pointerId !== drag.pointerId) return;
+          const { moved, ghost } = drag;
+          drag = null;
+
+          if (ghost) ghost.remove();
+          cardEl.style.opacity = "";
+
+          const targets = getTargets();
+          targets.forEach(t => t.classList.remove("drag-over"));
+
+          if (!moved) {
+            // 터치 선택 토글
+            if (selectedCardId === cardId) {
+              clearSelection();
+            } else {
+              clearSelection();
+              selectedCardId = cardId;
+              cardEl.classList.add("selected");
+              targets.forEach(t => {
+                if (!t.classList.contains("filled") && !t.classList.contains("fixed")) {
+                  t.classList.add("tap-ready");
+                }
+              });
+            }
+            return;
+          }
+
+          const hitTarget = targets.find(t => {
+            const r = t.getBoundingClientRect();
+            return (
+              e.clientX >= r.left - 12 &&
+              e.clientX <= r.right + 12 &&
+              e.clientY >= r.top - 12 &&
+              e.clientY <= r.bottom + 12
+            );
+          });
+
+          if (hitTarget) {
+            onDropToTarget(cardId, hitTarget);
+          }
+        };
+
+        window.addEventListener("pointermove", onMove, { passive: false });
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onUp);
+
+        cleanupFns.push(() => {
+          window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("pointerup", onUp);
+          window.removeEventListener("pointercancel", onUp);
+        });
+      }
+
+      /* ===== 1단계: 4개 팀 빌드 조립 ===== */
+      function renderPhase1() {
+        runCleanups();
+        clearSelection();
+        phase = 1;
+
+        leftTitleEl.textContent = "🖥️ 미래소프트 게임 엔진 v2.0";
+        leftSubEl.textContent = "드래그 또는 터치로 조립";
+        trayTitleEl.textContent = "📦 4개 팀 산출물";
+        traySubEl.textContent = `${BUILD_MODULES.length - assembled.size}개 남음`;
+
+        // 슬롯 생성
+        slotGrid.innerHTML = "";
+        BUILD_MODULES.forEach(mod => {
+          const slot = document.createElement("div");
+          slot.className = "build-slot" + (assembled.has(mod.id) ? " filled" : "");
+          slot.dataset.targetId = mod.id;
+          slot.innerHTML = assembled.has(mod.id)
+            ? `<div class="slot-team">${mod.emoji} ${mod.team}</div><div class="slot-sub">✓ 빌드 적용됨</div>`
+            : `<div class="slot-team">${mod.team}</div><div class="slot-sub">${mod.slotName}</div>`;
+
+          slot.addEventListener("click", () => {
+            if (phase !== 1 || !selectedCardId || slot.classList.contains("filled")) return;
+            handleModuleDrop(selectedCardId, slot);
+          });
+          slotGrid.appendChild(slot);
+        });
+
+        // 산출물 카드 생성 (랜덤 섞기)
+        trayList.innerHTML = "";
+        shuffle(BUILD_MODULES).forEach(mod => {
+          const card = document.createElement("div");
+          card.className = "drag-card" + (assembled.has(mod.id) ? " used" : "");
+          card.dataset.cardId = mod.id;
+          card.innerHTML = `
+            <div class="card-icon" style="background:${mod.color}">${mod.emoji}</div>
+            <div class="card-info">
+              <div class="card-name">${mod.cardName}</div>
+              <div class="card-desc">${mod.desc}</div>
+            </div>
+          `;
+          trayList.appendChild(card);
+
+          bindDragOrTapCard(
+            card,
+            mod.id,
+            () => [...slotGrid.querySelectorAll(".build-slot")],
+            handleModuleDrop
+          );
+        });
+
+        updatePhaseUI();
+      }
+
+      function handleModuleDrop(cardId, slotEl) {
+        if (slotEl.classList.contains("filled")) return;
+        const targetId = slotEl.dataset.targetId;
+        const mod = BUILD_MODULES.find(m => m.id === cardId);
+
+        if (cardId === targetId) {
+          clearSelection();
+          assembled.add(cardId);
+
+          slotEl.classList.add("filled");
+          slotEl.innerHTML = `<div class="slot-team">${mod.emoji} ${mod.team}</div><div class="slot-sub">✓ 빌드 적용됨</div>`;
+
+          const cardEl = trayList.querySelector(`[data-card-id="${cardId}"]`);
+          if (cardEl) cardEl.classList.add("used");
+
+          const pv = document.getElementById(mod.previewId);
+          if (pv) pv.classList.add("on");
+
+          const left = BUILD_MODULES.length - assembled.size;
+          traySubEl.textContent = `${left}개 남음`;
+          setLog(`[BUILD] ${mod.team} - ${mod.cardName} 통합 완료!`);
+          setGuide(`✨ [${mod.cardName}] 빌드 완료! ${left > 0 ? `남은 팀 산출물 ${left}개를 마저 조립하세요.` : "QA 자동 점검을 시작합니다..."}`, "good");
+          updatePhaseUI();
+
+          if (left === 0) {
+            setTimeout(() => startPhase2QA(), 550);
+          }
+        } else {
+          slotEl.classList.remove("wrong-flash");
+          void slotEl.offsetWidth;
+          slotEl.classList.add("wrong-flash");
+          setGuide(`⚠️ [${mod.cardName}]은(는) [${mod.team}] 슬롯에 넣어주세요!`, "warn");
+          setLog(`[WARN] 슬롯 불일치: ${mod.cardName} -> ${targetId}`);
+        }
+      }
+
+      /* ===== 2단계: 출시 직전 QA 버그 패치 ===== */
+      function startPhase2QA() {
+        runCleanups();
+        clearSelection();
+        phase = 2;
+
+        leftTitleEl.textContent = "🚨 QA 테스트 모니터 (버그 3건)";
+        leftSubEl.textContent = "패치 도구를 버그 위로!";
+        trayTitleEl.textContent = "🛠️ 긴급 패치 도구";
+        traySubEl.textContent = `${QA_BUGS.length - fixedBugs.size}건 남음`;
+
+        setGuide("🚨 출시 직전 버그 3건이 발견되었어요! 알맞은 패치 도구를 드래그(또는 터치)해 수정하세요!", "warn");
+        setLog("[QA] 3 errors detected before release. Hotfix required!");
+
+        // 버그 3종 렌더링
+        bugLayer.innerHTML = "";
+        QA_BUGS.forEach(bug => {
+          const el = document.createElement("div");
+          el.className = "bug-target" + (fixedBugs.has(bug.id) ? " fixed" : "");
+          el.dataset.bugId = bug.id;
+          el.innerHTML = `
+            <div class="bug-emoji">${bug.emoji}</div>
+            <div class="bug-name">${bug.name}</div>
+            <div class="bug-hint">${bug.hint}</div>
+          `;
+          el.addEventListener("click", () => {
+            if (phase !== 2 || !selectedCardId || el.classList.contains("fixed")) return;
+            handleBugPatch(selectedCardId, el);
+          });
+          bugLayer.appendChild(el);
+        });
+
+        // 패치 도구 3종 렌더링 (랜덤 순서)
+        trayList.innerHTML = "";
+        shuffle(QA_BUGS).forEach(bug => {
+          const card = document.createElement("div");
+          card.className = "drag-card" + (fixedBugs.has(bug.id) ? " used" : "");
+          card.dataset.cardId = bug.id;
+          card.innerHTML = `
+            <div class="card-icon" style="background:${bug.toolColor}">${bug.toolName.slice(0, 2)}</div>
+            <div class="card-info">
+              <div class="card-name">${bug.toolName.slice(2).trim()}</div>
+              <div class="card-desc">${bug.toolDesc}</div>
+            </div>
+          `;
+          trayList.appendChild(card);
+
+          bindDragOrTapCard(
+            card,
+            bug.id,
+            () => [...bugLayer.querySelectorAll(".bug-target")],
+            handleBugPatch
+          );
+        });
+
+        updatePhaseUI();
+      }
+
+      function handleBugPatch(toolId, bugEl) {
+        if (bugEl.classList.contains("fixed")) return;
+        const bugId = bugEl.dataset.bugId;
+        const bug = QA_BUGS.find(b => b.id === bugId);
+
+        if (toolId === bugId) {
+          clearSelection();
+          fixedBugs.add(bugId);
+
+          bugEl.classList.add("fixed");
+          bugEl.innerHTML = `
+            <div class="bug-emoji">✅</div>
+            <div class="bug-name">${bug.name}</div>
+            <div class="bug-hint">패치 완료!</div>
+          `;
+
+          const cardEl = trayList.querySelector(`[data-card-id="${toolId}"]`);
+          if (cardEl) cardEl.classList.add("used");
+
+          const left = QA_BUGS.length - fixedBugs.size;
+          traySubEl.textContent = `${left}건 남음`;
+          setLog(`[HOTFIX] ${bug.name} 해결 완료!`);
+          setGuide(
+            left > 0
+              ? `🛠️ [${bug.name}] 패치 성공! 남은 버그 ${left}건만 더 해결하세요.`
+              : "🎉 모든 버그 해결 완료! 이제 [게임 정식 출시!] 버튼을 눌러주세요!",
+            "good"
+          );
+          updatePhaseUI();
+
+          if (left === 0) {
+            setTimeout(() => startPhase3Launch(), 500);
+          }
+        } else {
+          bugEl.classList.remove("wrong-flash");
+          void bugEl.offsetWidth;
+          bugEl.classList.add("wrong-flash");
+          setGuide(`⚠️ [${bug.name}]에는 [${bug.hint.replace(" 필요", "")}] 도구를 사용해 주세요!`, "warn");
+          setLog(`[ERR] 패치 도구 불일치 -> ${bug.name}`);
+        }
+      }
+
+      /* ===== 3단계: 정식 출시 ===== */
+      function startPhase3Launch() {
+        runCleanups();
+        clearSelection();
+        phase = 3;
+
+        leftTitleEl.textContent = "✨ 최종 빌드 v1.0 (출시 대기)";
+        leftSubEl.textContent = "안정도 100%";
+        trayTitleEl.textContent = "✅ 출시 체크리스트";
+        traySubEl.textContent = "모두 통과";
+
+        trayList.innerHTML = `
+          <div class="drag-card used" style="opacity:1;background:#e4f8ee;border-color:#257353;">
+            <div class="card-icon" style="background:#b9ebd3">✅</div>
+            <div class="card-info">
+              <div class="card-name">4개 팀 빌드 통합</div>
+              <div class="card-desc">기획 · 그래픽 · 개발 · 사운드 100%</div>
+            </div>
+          </div>
+          <div class="drag-card used" style="opacity:1;background:#e4f8ee;border-color:#257353;">
+            <div class="card-icon" style="background:#b9ebd3">🛡️</div>
+            <div class="card-info">
+              <div class="card-name">QA 버그 패치 통과</div>
+              <div class="card-desc">치명적 오류 0건 · 배포 승인</div>
+            </div>
+          </div>
+        `;
+
+        setLog("[READY] All checks passed. Ready to deploy!");
+        setGuide("🚀 모든 준비가 끝났어요! 모니터 중앙의 [게임 정식 출시!] 버튼을 눌러 오픈하세요!", "good");
+        updatePhaseUI();
+      }
+
+      function handleLaunch() {
+        if (phase !== 3) return;
+        phase = 4;
+        updatePhaseUI();
+        setLog("[DEPLOY] MiraeSoft Game v1.0 LIVE!");
+        setGuide("🎉 축하합니다! 미래소프트 신작 게임이 성공적으로 출시되었습니다!", "good");
+
+        if (!clearSent) {
+          clearSent = true;
+          sendToZep({ type: "DEV_CLEAR" });
+        }
+
+        clearModal.classList.add("open");
+      }
+
+      function requestCloseWidget() {
+        runCleanups();
+        sendToZep({ type: "CLOSE" });
+        if (!window.parent || window.parent === window) {
+          clearModal.classList.remove("open");
+        }
+      }
+
+      function initGame() {
+        runCleanups();
+        assembled.clear();
+        fixedBugs.clear();
+        selectedCardId = null;
+        clearSent = false;
+
+        ["pvArt", "pvPlan", "pvDev", "pvSound"].forEach(id => {
+          document.getElementById(id).classList.remove("on");
+        });
+
+        clearModal.classList.remove("open");
+        setLog("[SYSTEM] MiraeSoft Studio 프로젝트 초기화 완료...");
+        setGuide("🧩 4개 팀의 작업물을 알맞은 엔진 슬롯으로 드래그(또는 터치)해 게임을 조립하세요!");
+        renderPhase1();
+      }
+
+      document.getElementById("btnLaunch").addEventListener("click", handleLaunch);
+      document.getElementById("btnReset").addEventListener("click", initGame);
+      document.getElementById("btnReplay").addEventListener("click", initGame);
+      document.getElementById("btnCloseTop").addEventListener("click", requestCloseWidget);
+      document.getElementById("btnCloseModal").addEventListener("click", requestCloseWidget);
+
+      initGame();
+    })();
+  </script>
+</body>
+</html>

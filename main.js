@@ -1,4 +1,4 @@
-// GAMES 정의에 mobile 크기 추가
+// 미니게임 3종 설정 (PC / 모바일 위젯 크기 분기 포함)
 const GAMES = {
     tidy: {
         file: "room-tidy.html",
@@ -8,15 +8,22 @@ const GAMES = {
         mWidth: 360,
         mHeight: 580,
     },
-    dripbag: {
-        file: "dripbag-tycoon.html",
-        title: "📦 미래 제작소 (드립백 제조)",
-        width: 1020,
-        height: 740,
+    miraesoft: {
+        file: "miraesoft-launch.html",
+        title: "🚀 미래소프트 · 게임 출시 대작전",
+        width: 980,
+        height: 680,
         mWidth: 360,
         mHeight: 580,
     },
-    // 1안(미래소프트 신규 게임) 제작 후 여기에 추가
+    dripbag: {
+        file: "dripbag-tycoon.html",
+        title: "☕ 미래 제작소 · 드립백 공방",
+        width: 1000,
+        height: 700,
+        mWidth: 360,
+        mHeight: 580,
+    },
 };
 
 // 위젯 닫기 공통 함수
@@ -42,6 +49,7 @@ function startMiniGame(player, gameKey) {
 
     const w = player.isMobile ? game.mWidth : game.width;
     const h = player.isMobile ? game.mHeight : game.height;
+
     player.tag.widget = player.showWidget(game.file, "middle", w, h);
     player.sendMessage(`${game.title} 미니게임을 시작합니다! (종료: /닫기)`, 0xffd740);
 
@@ -52,12 +60,15 @@ function startMiniGame(player, gameKey) {
         if (data.type === "CLOSE" || data.type === "TIDY_CLOSE") {
             closePlayerWidget(player);
         } else if (data.type === "TIDY_CLEAR") {
-            App.sayToAll(`🌤️ ${player.name}님이 [방 정돈]을 완료했습니다!`, 0x79d8b0);
-        } else if (data.type === "CAFE_CLEAR") {
-            App.sayToAll(`☕ ${player.name}님이 [청춘 카페] 영업을 마쳤습니다! (매출: ${data.cash || 0}원)`, 0xffad4e);
+            player.tag.hasRoomKey = true;
+            App.sayToAll(`🔑 ${player.name}님이 [방 정돈]을 마치고 현관 열쇠를 획득했습니다!`, 0x79d8b0);
+        } else if (data.type === "DEV_CLEAR") {
+            player.tag.miraesoftClear = true;
+            App.sayToAll(`🚀 ${player.name}님이 [미래소프트: 게임 출시 대작전] 신작을 출시했습니다!`, 0x9b94ff);
         } else if (data.type === "DRIP_CLEAR") {
+            player.tag.dripbagClear = true;
             App.sayToAll(
-                `📦 ${player.name}님이 [미래 제작소] 작업을 마쳤습니다! (매출: ${data.cash || 0}원)`,
+                `🎁 ${player.name}님이 [미래 제작소] 드립백 선물세트를 완성했습니다! (매출: ${(data.cash || 0).toLocaleString()}원)`,
                 0x83c9f4,
             );
         }
@@ -68,34 +79,31 @@ function startMiniGame(player, gameKey) {
 App.onJoinPlayer.Add(function (player) {
     player.tag = {};
     player.sendMessage(
-        "🎮 오브젝트 근처에서 [F] 키를 누르면 미니게임이 열립니다! (명령어: /방정리, /카페, /드립백, /닫기)",
+        "🎮 오브젝트 앞에서 [F] 키를 누르거나 채팅창에 [/방정리], [/미래소프트], [/드립백]을 입력해 보세요! (종료: /닫기)",
         0x79d8b0,
     );
 });
 
-// 맵 에디터 오브젝트 상호작용 (정석 API 적용)
+// 맵 에디터 오브젝트 상호작용 (ZEP Script 상호작용 -> obj.param1 기준)
 App.onObjectTouched.Add(function (sender, x, y, tileID, obj) {
     if (!obj) return;
 
-    // ZEP Script 상호작용 오브젝트인 경우
     if (obj.type === ObjectEffectType.INTERACTION_WITH_ZEPSCRIPTS) {
-        // 맵 에디터의 [값] 필드는 obj.param1로 들어옵니다.
         const val = String(obj.param1 || "").trim();
 
         if (val === "obj01" || val === "방정리") {
             startMiniGame(sender, "tidy");
-        } else if (val === "obj02" || val === "카페") {
-            startMiniGame(sender, "cafe");
+        } else if (val === "obj02" || val === "미래소프트" || val === "게임제작") {
+            startMiniGame(sender, "miraesoft");
         } else if (val === "obj03" || val === "드립백" || val === "제작소") {
             startMiniGame(sender, "dripbag");
         } else {
-            // 다른 값이거나 비어있는 경우 디버깅 메시지
             sender.sendMessage(`[오브젝트 감지] 번호(text): "${obj.text}", 값(param1): "${val}"`, 0xff8888);
         }
     }
 });
 
-// 채팅 명령어 감지 (보조 실행용)
+// 채팅 명령어 감지 (테스트 및 보조 실행용)
 App.onSay.Add(function (player, text) {
     const cmd = text.trim();
 
@@ -109,6 +117,6 @@ App.onSay.Add(function (player, text) {
     }
 
     if (cmd === "/방정리") startMiniGame(player, "tidy");
-    else if (cmd === "/카페") startMiniGame(player, "cafe");
+    else if (cmd === "/미래소프트" || cmd === "/게임제작") startMiniGame(player, "miraesoft");
     else if (cmd === "/드립백" || cmd === "/제작소") startMiniGame(player, "dripbag");
 });
